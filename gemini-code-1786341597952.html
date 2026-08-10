@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Analisa Efektivitas & Kinerja Teknisi Fiberisasi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (XLSX Parser) CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        .badge-container::-webkit-scrollbar,
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .badge-container::-webkit-scrollbar-track,
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .badge-container::-webkit-scrollbar-thumb,
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .badge-container::-webkit-scrollbar-thumb:hover,
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header & File Upload Section -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Dashboard Efektivitas & Tren Kinerja Teknisi</h1>
+                <p class="text-sm text-slate-500">Analisa Timely Report, 3 Stage Threshold SLA Success Rate, Top/Worst Branch Performance & Keselarasan Wilayah</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <span>Upload File Excel (.xlsx)</span>
+                    <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden">
+                </label>
+            </div>
+        </div>
+
+        <!-- Filter Controls Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                
+                <!-- MULTI-SELECT TOGGLE TANGGAL TT OPEN -->
+                <div class="relative flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Tanggal TT Open:</span>
+                    <button id="dateDropdownBtn" type="button" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex justify-between items-center gap-1">
+                        <span id="dateDropdownLabel" class="truncate">Semua Tanggal</span>
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div id="dateDropdownPanel" class="hidden absolute top-full left-20 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-lg z-50 p-3 space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-xs font-bold text-slate-700">Pilih Tanggal</span>
+                            <div class="space-x-1">
+                                <button type="button" id="btnSelectAllDate" class="text-[10px] text-blue-600 font-bold hover:underline">Semua</button>
+                                <span class="text-slate-300">|</span>
+                                <button type="button" id="btnClearDate" class="text-[10px] text-rose-600 font-bold hover:underline">Reset</button>
+                            </div>
+                        </div>
+                        <div id="dateCheckboxList" class="max-h-48 overflow-y-auto space-y-1.5 custom-scrollbar text-xs text-slate-700">
+                            <div class="text-slate-400 text-center py-2">Upload Excel dahulu...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Area -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Area:</span>
+                    <select id="areaFilter" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-32 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                        <option value="ALL">Semua Area</option>
+                    </select>
+                </div>
+
+                <!-- MULTI-SELECT TOGGLE REGIONAL MTEL -->
+                <div class="relative flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Regional MTEL:</span>
+                    <button id="regionalDropdownBtn" type="button" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-44 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex justify-between items-center gap-1">
+                        <span id="regionalDropdownLabel" class="truncate">Semua Regional</span>
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div id="regionalDropdownPanel" class="hidden absolute top-full left-20 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-lg z-50 p-3 space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-xs font-bold text-slate-700">Pilih Regional MTEL</span>
+                            <div class="space-x-1">
+                                <button type="button" id="btnSelectAllRegional" class="text-[10px] text-blue-600 font-bold hover:underline">Semua</button>
+                                <span class="text-slate-300">|</span>
+                                <button type="button" id="btnClearRegional" class="text-[10px] text-rose-600 font-bold hover:underline">Reset</button>
+                            </div>
+                        </div>
+                        <div id="regionalCheckboxList" class="max-h-48 overflow-y-auto space-y-1.5 custom-scrollbar text-xs text-slate-700">
+                            <div class="text-slate-400 text-center py-2">Upload Excel dahulu...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Status -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Filter Status:</span>
+                    <select id="statusFilter" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                        <option value="ALL">Semua Status (All)</option>
+                    </select>
+                </div>
+
+                <!-- Filter Kategori Waktu -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Shift Waktu:</span>
+                    <select id="timeFilter" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                        <option value="ALL">Semua Shift</option>
+                        <option value="Dini Hari">Dini Hari (00:00 - 05:59)</option>
+                        <option value="Pagi">Pagi (06:00 - 11:59)</option>
+                        <option value="Siang/Sore">Siang/Sore (12:00 - 17:59)</option>
+                        <option value="Malam">Malam (18:00 - 23:59)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 px-3.5 py-2 rounded-xl">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="dedupToggle" class="sr-only peer" checked>
+                    <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-800">Deduplikasi Tiket Unik</span>
+                    <span id="dedupStatusText" class="text-[10px] text-blue-600 font-semibold">Aktif</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Tiket Diuji</p>
+                <h3 id="kpiTotalTickets" class="text-3xl font-bold text-slate-800 mt-1">0</h3>
+                <p class="text-xs text-slate-500 mt-1" id="kpiBranchCount">0 Branch Terdeteksi</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Aktif PIC / Teknisi</p>
+                <h3 id="kpiTotalPIC" class="text-3xl font-bold text-blue-600 mt-1">0</h3>
+                <p class="text-xs text-rose-600 font-medium mt-1" id="kpiUnassigned">0 Tiket Tanpa PIC</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Overall SLA Success Rate</p>
+                <h3 id="kpiTimelyRate" class="text-3xl font-bold text-emerald-600 mt-1">0%</h3>
+                <p class="text-xs text-emerald-600 mt-1">Memenuhi Threshold SLA</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Rata-Rata TTR Timely Log</p>
+                <h3 id="kpiAvgTimelyTTR" class="text-3xl font-bold text-purple-600 mt-1">0 Jam</h3>
+                <p class="text-xs text-slate-500 mt-1" id="kpiAvgTravel">Travel Time: 0 Jam</p>
+            </div>
+        </div>
+
+        <!-- MODUL SUMMARY VISUAL DIBAGI DUA: TOP 10 BEST & TOP 10 WORST PERFORMANCE BRANCH -->
+        <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-lg space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700 pb-4">
+                <div>
+                    <h3 class="text-xl font-black text-white flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span>Comparison Analysis: Top 10 Best vs Top 10 Worst Branch Performance</span>
+                    </h3>
+                    <p class="text-xs text-slate-300">Visualisasi metrik gabungan: Jumlah Teknisi (Org), Jumlah Gangguan (Tiket), & Success Rate (%) per Branch.</p>
+                </div>
+                <input type="text" id="branchSearchInput" placeholder="Cari Branch..." class="text-xs border border-slate-600 bg-slate-900 text-white rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
+            </div>
+
+            <!-- CONTAINER DIBAGI DUA (BEST & WORST PERFORMANCE) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative">
+                <!-- SEPARATOR LINE FOR LARGE SCREENS -->
+                <div class="hidden lg:block absolute inset-y-0 left-1/2 w-0.5 bg-slate-600 transform -translate-x-1/2"></div>
+
+                <!-- LEFT BOX: TOP 10 BEST PERFORMANCE BRANCH -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-emerald-500/30 shadow-md space-y-3">
+                    <div class="flex justify-between items-center border-b border-emerald-500/20 pb-2">
+                        <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wide flex items-center gap-2">
+                            <span>🏆 Best Performance Branch (Top 10)</span>
+                        </h4>
+                        <span class="text-[10px] text-emerald-300 bg-emerald-950/80 px-2.5 py-1 rounded-full font-bold border border-emerald-500/30">SLA Success Rate Tinggi</span>
+                    </div>
+                    <div class="relative h-96">
+                        <canvas id="chartBestBranch"></canvas>
+                    </div>
+                </div>
+
+                <!-- RIGHT BOX: TOP 10 WORST PERFORMANCE BRANCH -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-rose-500/30 shadow-md space-y-3">
+                    <div class="flex justify-between items-center border-b border-rose-500/20 pb-2">
+                        <h4 class="text-sm font-bold text-rose-400 uppercase tracking-wide flex items-center gap-2">
+                            <span>⚠️ Worst Performance Branch (Top 10)</span>
+                        </h4>
+                        <span class="text-[10px] text-rose-300 bg-rose-950/80 px-2.5 py-1 rounded-full font-bold border border-rose-500/30">Membutuhkan Intervensi</span>
+                    </div>
+                    <div class="relative h-96">
+                        <canvas id="chartWorstBranch"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABEL SUMMARY PER BRANCH -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs mt-4">
+                <div class="p-3 bg-slate-100 border-b border-slate-200 font-bold text-slate-700 text-xs uppercase">
+                    Rincian Kinerja Seluruh Branch
+                </div>
+                <div class="overflow-x-auto max-h-80 custom-scrollbar">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-50 text-slate-700 uppercase font-bold sticky top-0 z-10 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-3 w-10 text-center">No</th>
+                                <th class="py-3 px-4 min-w-[180px]">Branch</th>
+                                <th class="py-3 px-3 text-center">Area</th>
+                                <th class="py-3 px-3 text-center">Regional MTEL</th>
+                                <th class="py-3 px-3 text-center">Jumlah Teknisi</th>
+                                <th class="py-3 px-3 text-center">Total Tiket</th>
+                                <th class="py-3 px-3 text-center">1. Create -> Prep</th>
+                                <th class="py-3 px-3 text-center">2. Prep -> Tiba</th>
+                                <th class="py-3 px-3 text-center">3. Tiba -> Close</th>
+                                <th class="py-3 px-4 text-center bg-indigo-100/70 text-indigo-950 font-black">Branch SLA Success Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody id="branchTableBody" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="10" class="text-center py-8 text-slate-400">Silakan unggah file Excel untuk melihat summary per Branch.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODUL 3 MILESTONE SLA THRESHOLD SUCCESS RATE -->
+        <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-6 bg-gradient-to-r from-emerald-50/30 via-white to-white space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-emerald-950 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 0 0118 0z"></path></svg>
+                        <span>Analisa SLA Success Rate 3 Stage Operasional (Per Teknisi)</span>
+                    </h3>
+                    <p class="text-xs text-emerald-800">Threshold: 1. Create -> Prepare (< 15m) | 2. Prepare -> Tiba (< 105m) | 3. Tiba -> Tech Close (< 120m)</p>
+                </div>
+                <input type="text" id="milestoneSearchInput" placeholder="Cari Nama Teknisi / Branch..." class="text-xs border border-emerald-300 rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full md:w-64 bg-white shadow-2xs">
+            </div>
+
+            <!-- Mini Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-emerald-50/80 border border-emerald-200 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-bold text-emerald-700 uppercase">Jumlah Teknisi Aktif</p>
+                        <h4 id="msCardTechCount" class="text-2xl font-black text-emerald-900 mt-0.5">0 Teknisi</h4>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-emerald-200/60 flex items-center justify-center text-emerald-700 font-bold">👥</div>
+                </div>
+                <div class="bg-blue-50/80 border border-blue-200 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-bold text-blue-700 uppercase">Total Tiket Diuji</p>
+                        <h4 id="msCardTicketCount" class="text-2xl font-black text-blue-900 mt-0.5">0 Tiket</h4>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-blue-200/60 flex items-center justify-center text-blue-700 font-bold">🎫</div>
+                </div>
+                <div class="bg-purple-50/80 border border-purple-200 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-bold text-purple-700 uppercase">National SLA Success Rate</p>
+                        <h4 id="msCardOverallRate" class="text-2xl font-black text-purple-900 mt-0.5">0%</h4>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-purple-200/60 flex items-center justify-center text-purple-700 font-bold">🎯</div>
+                </div>
+            </div>
+
+            <!-- Visual Performance per Stage (Nasional) -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-3">
+                <h4 class="text-xs font-bold text-slate-700 uppercase">Pencapaian SLA Threshold Per Stage (Nasional)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-xs" id="durationStagesContainer">
+                    <!-- Cards injected via JS -->
+                </div>
+            </div>
+
+            <!-- Tabel Success Rate & Durasi per Teknisi (3 Milestones) -->
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+                <div class="overflow-x-auto max-h-96 custom-scrollbar">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-bold sticky top-0 z-10 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-3 w-10 text-center">No</th>
+                                <th class="py-3 px-4 min-w-[180px]">Teknisi (PIC)</th>
+                                <th class="py-3 px-3">Branch</th>
+                                <th class="py-3 px-3 text-center">Total TT</th>
+                                <th class="py-3 px-3 text-center" title="Create s/d Prepare (Target <= 15 Min)">1. Create -> Prepare<br><span class="text-[10px] text-slate-400 font-normal">Target < 15m</span></th>
+                                <th class="py-3 px-3 text-center" title="Prepare s/d Tiba (Target <= 1j 45m)">2. Prepare -> Tiba<br><span class="text-[10px] text-slate-400 font-normal">Target < 105m</span></th>
+                                <th class="py-3 px-4 text-center" title="Tiba s/d Tech Close (Target <= 2j)">3. Tiba -> Close<br><span class="text-[10px] text-slate-400 font-normal">Target < 120m</span></th>
+                                <th class="py-3 px-4 text-center bg-emerald-100/70 text-emerald-950 font-black">SLA Success Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody id="milestoneTableBody" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="8" class="text-center py-8 text-slate-400">Silakan unggah file Excel untuk melihat matriks SLA success rate.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MATRIKS TREND HARIAN PENUGASAN TIKET PER TEKNISI -->
+        <div class="bg-white rounded-2xl border border-blue-200 shadow-sm overflow-hidden bg-gradient-to-r from-blue-50/30 via-white to-white space-y-3 p-5">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h3 class="text-base font-bold text-blue-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span>Matriks Trend Harian Penugasan Tiket Per Teknisi</span>
+                    </h3>
+                    <p class="text-xs text-blue-700">Memantau pengulangan penugasan teknisi yang sama beserta daftar Nomor Tiket yang diterima per hari.</p>
+                </div>
+                <input type="text" id="dailyTrendSearchInput" placeholder="Cari Nama Teknisi / Branch..." class="text-xs border border-blue-300 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64 bg-white">
+            </div>
+
+            <div class="overflow-x-auto max-h-[550px] border border-blue-100 rounded-xl relative custom-scrollbar">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead id="dailyMatrixHeader" class="bg-slate-100 text-slate-800 uppercase border-b border-slate-200 sticky top-0 z-20 font-bold shadow-xs">
+                    </thead>
+                    <tbody id="dailyMatrixBody" class="divide-y divide-slate-200 text-slate-700 bg-white">
+                        <tr>
+                            <td colspan="3" class="text-center py-12 text-slate-400">Silakan unggah file Excel data tiket untuk menampilkan matriks trend harian.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TABEL RINCIAN TTR LOG TIMELY REPORT PER TIKET -->
+        <div class="bg-white rounded-2xl border border-purple-200 shadow-sm overflow-hidden bg-gradient-to-r from-purple-50/20 via-white to-white">
+            <div class="p-5 border-b border-purple-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h3 class="text-base font-bold text-purple-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 0 0118 0z"></path></svg>
+                        <span>Visualisasi Rincian TTR Timely Report Per Tiket</span>
+                    </h3>
+                    <p class="text-xs text-purple-700">Menganalisa persis waktu create, posisi aktivitas terakhir, dan durasi TTR nyata pada log Timely Report.</p>
+                </div>
+                <input type="text" id="timelyDetailSearchInput" placeholder="Cari Teknisi / No Tiket / Aktivitas..." class="text-xs border border-purple-300 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 w-full sm:w-64 bg-white">
+            </div>
+
+            <div class="overflow-x-auto max-h-80 custom-scrollbar">
+                <table class="w-full text-left text-xs text-slate-600">
+                    <thead class="bg-purple-100/80 text-purple-950 uppercase border-b border-purple-200 sticky top-0 z-10 font-bold">
+                        <tr>
+                            <th class="py-3 px-4">Teknisi (PIC)</th>
+                            <th class="py-3 px-4">Nomor Tiket</th>
+                            <th class="py-3 px-4">Waktu Tiket di Create</th>
+                            <th class="py-3 px-4">Waktu & Aktivitas Terakhir</th>
+                            <th class="py-3 px-4 text-center bg-purple-200/50">TTR Timely Report</th>
+                        </tr>
+                    </thead>
+                    <tbody id="timelyDetailTableBody" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-slate-400">Silakan unggah file Excel untuk melihat rincian TTR Timely Report.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VISUALISASI SEBARAN JAM OPEN TROUBLE TICKET -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 0 0118 0z"></path></svg>
+                        <span>Visualisasi Jam Open Trouble Ticket (Start TT Open Time)</span>
+                    </h3>
+                    <p class="text-xs text-slate-500">Peta sebaran waktu masuknya tiket per jam (00:00 - 23:00 WIB) untuk mengidentifikasi jam puncak (peak hours) gangguan.</p>
+                </div>
+            </div>
+            <div class="relative h-64">
+                <canvas id="chartHourlyOpenTime"></canvas>
+            </div>
+        </div>
+
+        <!-- Section Analisa Waktu Kejadian -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800 mb-1">Kategori Shift Kejadian</h3>
+                    <p class="text-xs text-slate-500 mb-4">Pembagian Dini Hari, Pagi, Siang, dan Malam</p>
+                    <div class="relative h-56 flex justify-center">
+                        <canvas id="chartTimeOfDay"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2">
+                <h3 class="text-base font-bold text-slate-800 mb-1">Perbandingan TTR Log Timely Menurut Shift Kejadian</h3>
+                <p class="text-xs text-slate-500 mb-4">Melihat durasi perbaikan dari Create hingga Aktivitas Terakhir pada Timely Report</p>
+                <div class="relative h-56">
+                    <canvas id="chartTimePerformance"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISUALISASI MATRIKS KESELARAN AREA -> REGIONAL MTEL -> BRANCH -> TEKNISI -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <span>Matriks Keselarasan Wilayah & Penugasan Teknisi</span>
+                    </h3>
+                    <p class="text-xs text-slate-500">Menganalisa rasio kecukupan teknisi berdasarkan Area, Regional MTEL, dan Branch.</p>
+                </div>
+                <input type="text" id="alignmentSearchInput" placeholder="Cari Area / Regional / Branch / PIC..." class="text-xs border border-slate-300 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64 bg-white">
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-600">
+                    <thead class="bg-slate-100/70 text-slate-600 uppercase border-b border-slate-200 font-bold">
+                        <tr>
+                            <th class="py-3 px-4">Area</th>
+                            <th class="py-3 px-4">Regional MTEL</th>
+                            <th class="py-3 px-4">Branch</th>
+                            <th class="py-3 px-4 text-center">Jumlah Tiket</th>
+                            <th class="py-3 px-4">Daftar Teknisi Ditugaskan</th>
+                            <th class="py-3 px-4 text-center">Status Keselarasan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alignmentTableBody" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-slate-400">Silakan unggah file Excel untuk melihat matriks keselarasan.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Visualisasi Tiket Tanpa PIC Section -->
+        <div class="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm bg-gradient-to-r from-rose-50/40 via-white to-white space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div>
+                    <h3 class="text-lg font-bold text-rose-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span>Analisa & Visualisasi Tiket Tanpa PIC</span>
+                    </h3>
+                    <p class="text-xs text-rose-700">Rincian Nomor Tiket, Wilayah Branch, dan Status Operasional untuk tiket yang tidak memiliki identitas teknisi.</p>
+                </div>
+                <input type="text" id="searchUnassignedInput" placeholder="Cari No Tiket / Branch..." class="text-xs border border-rose-300 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500 w-full md:w-56 bg-white">
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase mb-3">Sebaran Branch Tiket Tanpa PIC</h4>
+                    <div class="relative h-56">
+                        <canvas id="chartUnassignedBranch"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col items-center">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase mb-3 w-full text-left">Status Tiket Tanpa PIC</h4>
+                    <div class="relative h-56 w-full flex justify-center">
+                        <canvas id="chartUnassignedStatus"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-rose-200 overflow-hidden shadow-xs">
+                <div class="px-4 py-3 bg-rose-100/50 border-b border-rose-200 flex justify-between items-center">
+                    <span class="text-xs font-bold text-rose-900 uppercase">Daftar Rincian Nomor Tiket Tanpa PIC</span>
+                    <span id="unassignedCountBadge" class="bg-rose-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">0 Tiket</span>
+                </div>
+                <div class="overflow-y-auto max-h-60 custom-scrollbar">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-50 text-slate-500 uppercase border-b border-slate-200 sticky top-0 font-bold">
+                            <tr>
+                                <th class="py-2.5 px-3">Nomor Tiket (Kolom Tiket)</th>
+                                <th class="py-2.5 px-3">Nomor TT</th>
+                                <th class="py-2.5 px-3">Branch</th>
+                                <th class="py-2.5 px-3 text-center">TTR NET (Jam)</th>
+                                <th class="py-2.5 px-3 text-center">Status Tiket</th>
+                            </tr>
+                        </thead>
+                        <tbody id="unassignedTableBody" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-slate-400">Belum ada data unggahan.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section 1: Main Performance -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-base font-bold text-slate-800 mb-4">Top 10 Teknisi Berdasarkan Beban Tiket</h3>
+                <div class="relative h-72">
+                    <canvas id="chartTopPIC"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-base font-bold text-slate-800 mb-4">Kelengkapan Milestone Timely Report</h3>
+                <div class="relative h-72 flex justify-center">
+                    <canvas id="chartCompleteness"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section: Detail Per Kinerja Teknisi -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Analisa Efektivitas & Rata-Rata TTR Log Timely Per Teknisi</h3>
+                    <p class="text-xs text-slate-500">Kalkulasi TTR rata-rata per teknisi dari waktu Tiket Dicreate sampai Aktivitas Terakhir</p>
+                </div>
+                <input type="text" id="searchInput" placeholder="Cari Nama Teknisi / Branch..." class="text-sm border border-slate-300 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64">
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-50 text-xs text-slate-500 uppercase border-b border-slate-100 font-bold">
+                        <tr>
+                            <th class="py-3 px-4">Nama PIC / Teknisi</th>
+                            <th class="py-3 px-4">Branch Utama</th>
+                            <th class="py-3 px-4 text-center">Total Tiket</th>
+                            <th class="py-3 px-4 text-center">Milestone Lengkap</th>
+                            <th class="py-3 px-4 text-center">Avg Response (Jam)</th>
+                            <th class="py-3 px-4 text-center bg-purple-50 text-purple-900">Avg TTR Log Timely (Jam)</th>
+                            <th class="py-3 px-4 text-center">Status Evaluasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="technicianTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-8 text-slate-400">Silakan unggah file data Excel untuk menampilkan analisa.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let rawDataset = [];
+        let selectedDates = new Set();
+        let selectedRegionals = new Set();
+
+        let chartBestBranchInstance = null;
+        let chartWorstBranchInstance = null;
+        let chartTopPICInstance = null;
+        let chartCompletenessInstance = null;
+        let chartUnassignedBranchInstance = null;
+        let chartUnassignedStatusInstance = null;
+        let chartTimeOfDayInstance = null;
+        let chartTimePerformanceInstance = null;
+        let chartHourlyOpenTimeInstance = null;
+
+        // SLA THRESHOLD CONSTANTS (IN MINUTES)
+        const THRESHOLD_STAGE1_MIN = 15;        // Create -> Prepare (15 Menit)
+        const THRESHOLD_STAGE2_MIN = 105;       // Prepare -> Tiba (1.45 Jam = 105 Menit)
+        const THRESHOLD_STAGE3_MIN = 120;       // Tiba -> Tech Close (2 Jam = 120 Menit)
+
+        document.getElementById('excelFileInput').addEventListener('change', handleFileUpload);
+        document.getElementById('dedupToggle').addEventListener('change', applyFilters);
+        document.getElementById('areaFilter').addEventListener('change', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        document.getElementById('timeFilter').addEventListener('change', applyFilters);
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('branchSearchInput').addEventListener('input', applyFilters);
+        document.getElementById('milestoneSearchInput').addEventListener('input', applyFilters);
+        document.getElementById('alignmentSearchInput').addEventListener('input', applyFilters);
+        document.getElementById('timelyDetailSearchInput').addEventListener('input', applyFilters);
+        document.getElementById('searchUnassignedInput').addEventListener('input', applyFilters);
+        document.getElementById('dailyTrendSearchInput').addEventListener('input', applyFilters);
+
+        // DATE DROPDOWN TOGGLE LISTENERS
+        const dateDropdownBtn = document.getElementById('dateDropdownBtn');
+        const dateDropdownPanel = document.getElementById('dateDropdownPanel');
+
+        dateDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dateDropdownPanel.classList.toggle('hidden');
+            regDropdownPanel.classList.add('hidden');
+        });
+
+        document.getElementById('btnSelectAllDate').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.date-checkbox');
+            checkboxes.forEach(cb => { cb.checked = true; selectedDates.add(cb.value); });
+            updateDateDropdownLabel();
+            applyFilters();
+        });
+
+        document.getElementById('btnClearDate').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.date-checkbox');
+            checkboxes.forEach(cb => { cb.checked = false; });
+            selectedDates.clear();
+            updateDateDropdownLabel();
+            applyFilters();
+        });
+
+        // REGIONAL DROPDOWN TOGGLE LISTENERS
+        const regDropdownBtn = document.getElementById('regionalDropdownBtn');
+        const regDropdownPanel = document.getElementById('regionalDropdownPanel');
+
+        regDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            regDropdownPanel.classList.toggle('hidden');
+            dateDropdownPanel.classList.add('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!regDropdownPanel.contains(e.target) && !regDropdownBtn.contains(e.target)) {
+                regDropdownPanel.classList.add('hidden');
+            }
+            if (!dateDropdownPanel.contains(e.target) && !dateDropdownBtn.contains(e.target)) {
+                dateDropdownPanel.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('btnSelectAllRegional').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.reg-checkbox');
+            checkboxes.forEach(cb => { cb.checked = true; selectedRegionals.add(cb.value); });
+            updateRegionalDropdownLabel();
+            applyFilters();
+        });
+
+        document.getElementById('btnClearRegional').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.reg-checkbox');
+            checkboxes.forEach(cb => { cb.checked = false; });
+            selectedRegionals.clear();
+            updateRegionalDropdownLabel();
+            applyFilters();
+        });
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                rawDataset = XLSX.utils.sheet_to_json(worksheet);
+
+                populateDropdowns(rawDataset);
+                applyFilters();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function deduplicateDataset(data) {
+            const ticketMap = new Map();
+
+            data.forEach(row => {
+                const ticketId = String(row['Tiket'] || row['Nomor TT'] || '').trim();
+                if (!ticketId) return;
+
+                if (!ticketMap.has(ticketId)) {
+                    ticketMap.set(ticketId, row);
+                } else {
+                    const existingRow = ticketMap.get(ticketId);
+                    const currStatus = String(row['Status'] || '').toLowerCase();
+                    const existingStatus = String(existingRow['Status'] || '').toLowerCase();
+
+                    if ((existingStatus.includes('cancel') || existingStatus.includes('dobel')) && 
+                        (!currStatus.includes('cancel') && !currStatus.includes('dobel'))) {
+                        ticketMap.set(ticketId, row);
+                    }
+                }
+            });
+
+            return Array.from(ticketMap.values());
+        }
+
+        function extractPIC(timelyText) {
+            if (!timelyText || typeof timelyText !== 'string') return 'Tidak Ada PIC';
+            const match = timelyText.match(/PIC:\s*([^\n\r]+)/i);
+            if (match && match[1]) {
+                const val = match[1].trim();
+                if (val === "" || val.toLowerCase() === "timely report") return 'Tidak Ada PIC';
+                return val;
+            }
+            return 'Tidak Ada PIC';
+        }
+
+        // PARSING 3 STAGES DAN EVALUASI THRESHOLD SLA
+        function parse3StageMilestones(timelyText) {
+            if (!timelyText || typeof timelyText !== 'string') {
+                return {
+                    durations: { stage1Min: null, stage2Min: null, stage3Min: null },
+                    slaPass: { stage1: false, stage2: false, stage3: false }
+                };
+            }
+
+            const lines = timelyText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let timeMap = {
+                create: null,
+                prepare: null,
+                tiba: null,
+                lastActivity: null
+            };
+
+            lines.forEach(line => {
+                const match = line.match(/(\d{2}):(\d{2})\s*=\s*(.+)/);
+                if (match) {
+                    const hh = parseInt(match[1], 10);
+                    const mm = parseInt(match[2], 10);
+                    const totalMins = hh * 60 + mm;
+                    const actStr = match[3].toLowerCase();
+
+                    if (actStr.includes('dicreate') || actStr.includes('create')) {
+                        if (timeMap.create === null) timeMap.create = totalMins;
+                    }
+                    if (actStr.includes('prepare')) {
+                        if (timeMap.prepare === null) timeMap.prepare = totalMins;
+                    }
+                    if (actStr.includes('tiba')) {
+                        if (timeMap.tiba === null) timeMap.tiba = totalMins;
+                    }
+                    timeMap.lastActivity = totalMins;
+                }
+            });
+
+            function calcDiff(start, end) {
+                if (start === null || end === null) return null;
+                let diff = end - start;
+                if (diff < 0) diff += 24 * 60;
+                return diff;
+            }
+
+            const stage1Min = calcDiff(timeMap.create, timeMap.prepare);
+            const stage2Min = calcDiff(timeMap.prepare, timeMap.tiba);
+            const stage3Min = calcDiff(timeMap.tiba, timeMap.lastActivity);
+
+            const passS1 = (stage1Min !== null) && (stage1Min <= THRESHOLD_STAGE1_MIN);
+            const passS2 = (stage2Min !== null) && (stage2Min <= THRESHOLD_STAGE2_MIN);
+            const passS3 = (stage3Min !== null) && (stage3Min <= THRESHOLD_STAGE3_MIN);
+
+            return {
+                durations: {
+                    stage1Min: stage1Min,
+                    stage2Min: stage2Min,
+                    stage3Min: stage3Min
+                },
+                slaPass: {
+                    stage1: passS1,
+                    stage2: passS2,
+                    stage3: passS3
+                }
+            };
+        }
+
+        function checkCompleteness(timelyText) {
+            if (!timelyText || typeof timelyText !== 'string') return 'Direct Close';
+            const res = parse3StageMilestones(timelyText);
+            const d = res.durations;
+            if (d.stage1Min !== null && d.stage2Min !== null && d.stage3Min !== null) return 'Lengkap';
+            if (d.stage1Min !== null || d.stage2Min !== null || d.stage3Min !== null) return 'Parsial';
+            return 'Direct Close';
+        }
+
+        function formatDate(openTimeString) {
+            if (!openTimeString) return 'Unknown Date';
+            let str = String(openTimeString).trim();
+            let match = str.match(/(\d{4}-\d{2}-\d{2})|(\d{2}\/\d{2}\/\d{4})/);
+            if (match) {
+                let dStr = match[0];
+                if (dStr.includes('-')) {
+                    let parts = dStr.split('-');
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+                return dStr;
+            }
+            return 'Unknown Date';
+        }
+
+        function parseTimelyFullDetails(timelyText, openTimeFallback) {
+            if (!timelyText || typeof timelyText !== 'string') {
+                return {
+                    startTimeStr: openTimeFallback || '-',
+                    lastTimeStr: '-',
+                    lastActivity: '-',
+                    durationHours: 0
+                };
+            }
+
+            const lines = timelyText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let entries = [];
+
+            lines.forEach(line => {
+                const match = line.match(/(\d{2}\/\d{2}\/\d{4})?\s*(\d{2}):(\d{2})\s*=\s*(.+)/);
+                if (match) {
+                    const dateStr = match[1] || '';
+                    const hhStr = match[2];
+                    const mmStr = match[3];
+                    const hh = parseInt(hhStr, 10);
+                    const mm = parseInt(mmStr, 10);
+                    const totalMins = hh * 60 + mm;
+                    const activity = match[4].trim();
+
+                    entries.push({
+                        dateStr: dateStr,
+                        timeFormatted: `${hhStr}:${mmStr}`,
+                        totalMins: totalMins,
+                        activity: activity,
+                        fullStr: (dateStr ? dateStr + ' ' : '') + `${hhStr}:${mmStr} (${activity})`
+                    });
+                }
+            });
+
+            if (entries.length >= 1) {
+                const first = entries[0];
+                const last = entries[entries.length - 1];
+
+                let startMins = first.totalMins;
+                let lastMins = last.totalMins;
+                if (lastMins < startMins) {
+                    lastMins += 24 * 60;
+                }
+
+                let diffHours = (entries.length > 1) ? ((lastMins - startMins) / 60.0) : 0;
+
+                return {
+                    startTimeStr: first.fullStr,
+                    lastTimeStr: last.fullStr,
+                    lastActivity: last.activity,
+                    durationHours: diffHours
+                };
+            }
+
+            return {
+                startTimeStr: openTimeFallback || '-',
+                lastTimeStr: '-',
+                lastActivity: '-',
+                durationHours: 0
+            };
+        }
+
+        function extractHour(openTimeString) {
+            if (!openTimeString) return -1;
+            let str = String(openTimeString);
+            let match = str.match(/(\d{1,2}):\d{2}/);
+            if (match) {
+                return parseInt(match[1], 10);
+            }
+            return -1;
+        }
+
+        function parseTimeOfDay(openTimeString) {
+            let hour = extractHour(openTimeString);
+            if (hour === -1) return 'Unknown';
+
+            if (hour >= 0 && hour < 6) return 'Dini Hari';
+            if (hour >= 6 && hour < 12) return 'Pagi';
+            if (hour >= 12 && hour < 18) return 'Siang/Sore';
+            return 'Malam';
+        }
+
+        function populateDropdowns(data) {
+            const dateCheckboxList = document.getElementById('dateCheckboxList');
+            dateCheckboxList.innerHTML = '';
+            selectedDates.clear();
+            const dateSet = new Set();
+
+            const areaSelect = document.getElementById('areaFilter');
+            areaSelect.innerHTML = '<option value="ALL">Semua Area</option>';
+            const areaSet = new Set();
+
+            const regSet = new Set();
+
+            const statusSelect = document.getElementById('statusFilter');
+            statusSelect.innerHTML = '<option value="ALL">Semua Status (All)</option>';
+            const statusSet = new Set();
+
+            data.forEach(row => {
+                const d = formatDate(row['Start TT Open Time']);
+                if (d !== 'Unknown Date') dateSet.add(d);
+
+                if (row['Area'] !== undefined && row['Area'] !== null) areaSet.add(String(row['Area']).trim());
+                if (row['Regional MTEL']) regSet.add(String(row['Regional MTEL']).trim());
+                if (row['Status']) statusSet.add(String(row['Status']).trim());
+            });
+
+            // POPULATE CHECKBOX FILTER TANGGAL
+            Array.from(dateSet).sort().forEach(dt => {
+                selectedDates.add(dt);
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2 hover:bg-slate-50 p-1 rounded';
+                div.innerHTML = `
+                    <input type="checkbox" value="${dt}" class="date-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
+                    <span class="truncate">${dt}</span>
+                `;
+                dateCheckboxList.appendChild(div);
+            });
+
+            document.querySelectorAll('.date-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectedDates.add(e.target.value);
+                    } else {
+                        selectedDates.delete(e.target.value);
+                    }
+                    updateDateDropdownLabel();
+                    applyFilters();
+                });
+            });
+            updateDateDropdownLabel();
+
+            Array.from(areaSet).sort().forEach(ar => {
+                const opt = document.createElement('option');
+                opt.value = ar;
+                opt.textContent = 'Area ' + ar;
+                areaSelect.appendChild(opt);
+            });
+
+            Array.from(statusSet).sort().forEach(st => {
+                if (st && st !== 'undefined') {
+                    const opt = document.createElement('option');
+                    opt.value = st;
+                    opt.textContent = st;
+                    statusSelect.appendChild(opt);
+                }
+            });
+
+            const regCheckboxList = document.getElementById('regionalCheckboxList');
+            regCheckboxList.innerHTML = '';
+            selectedRegionals.clear();
+
+            Array.from(regSet).sort().forEach(reg => {
+                selectedRegionals.add(reg);
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2 hover:bg-slate-50 p-1 rounded';
+                div.innerHTML = `
+                    <input type="checkbox" value="${reg}" class="reg-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
+                    <span class="truncate">${reg}</span>
+                `;
+                regCheckboxList.appendChild(div);
+            });
+
+            document.querySelectorAll('.reg-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectedRegionals.add(e.target.value);
+                    } else {
+                        selectedRegionals.delete(e.target.value);
+                    }
+                    updateRegionalDropdownLabel();
+                    applyFilters();
+                });
+            });
+
+            updateRegionalDropdownLabel();
+        }
+
+        function updateDateDropdownLabel() {
+            const totalCb = document.querySelectorAll('.date-checkbox').length;
+            const selectedCount = selectedDates.size;
+            const label = document.getElementById('dateDropdownLabel');
+
+            if (selectedCount === totalCb || totalCb === 0) {
+                label.innerText = 'Semua Tanggal';
+            } else if (selectedCount === 0) {
+                label.innerText = 'Tidak Ada Terpilih';
+            } else {
+                label.innerText = `${selectedCount} Tanggal Terpilih`;
+            }
+        }
+
+        function updateRegionalDropdownLabel() {
+            const totalCb = document.querySelectorAll('.reg-checkbox').length;
+            const selectedCount = selectedRegionals.size;
+            const label = document.getElementById('regionalDropdownLabel');
+
+            if (selectedCount === totalCb || totalCb === 0) {
+                label.innerText = 'Semua Regional';
+            } else if (selectedCount === 0) {
+                label.innerText = 'Tidak Ada Terpilih';
+            } else {
+                label.innerText = `${selectedCount} Regional Terpilih`;
+            }
+        }
+
+        function applyFilters() {
+            if (!rawDataset || rawDataset.length === 0) return;
+
+            const isDedupActive = document.getElementById('dedupToggle').checked;
+            const dedupStatusText = document.getElementById('dedupStatusText');
+
+            let baseData = isDedupActive ? deduplicateDataset(rawDataset) : rawDataset;
+
+            if (isDedupActive) {
+                dedupStatusText.innerText = `Aktif (${baseData.length} Tiket Unik)`;
+                dedupStatusText.className = "text-[10px] text-blue-600 font-semibold";
+            } else {
+                dedupStatusText.innerText = `Mati (${rawDataset.length} Total Transaksi)`;
+                dedupStatusText.className = "text-[10px] text-amber-600 font-semibold";
+            }
+
+            const selectedArea = document.getElementById('areaFilter').value;
+            const selectedStatus = document.getElementById('statusFilter').value;
+            const selectedTime = document.getElementById('timeFilter').value;
+
+            const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+            const branchSearch = document.getElementById('branchSearchInput').value.toLowerCase();
+            const milestoneSearch = document.getElementById('milestoneSearchInput').value.toLowerCase();
+            const alignmentSearch = document.getElementById('alignmentSearchInput').value.toLowerCase();
+            const timelySearch = document.getElementById('timelyDetailSearchInput').value.toLowerCase();
+            const unassignedSearch = document.getElementById('searchUnassignedInput').value.toLowerCase();
+            const dailySearch = document.getElementById('dailyTrendSearchInput').value.toLowerCase();
+
+            const filtered = baseData.filter(row => {
+                const rowDate = formatDate(row['Start TT Open Time']);
+                const matchesDate = selectedDates.size === 0 || selectedDates.has(rowDate);
+
+                const matchesArea = (selectedArea === 'ALL') || (String(row['Area']).trim() === selectedArea);
+                
+                const rowRegional = String(row['Regional MTEL'] || '').trim();
+                const matchesRegional = selectedRegionals.size === 0 || selectedRegionals.has(rowRegional);
+
+                const matchesStatus = (selectedStatus === 'ALL') || (String(row['Status']).trim() === selectedStatus);
+                const tod = parseTimeOfDay(row['Start TT Open Time']);
+                const matchesTime = (selectedTime === 'ALL') || (tod === selectedTime);
+
+                return matchesDate && matchesArea && matchesRegional && matchesStatus && matchesTime;
+            });
+
+            processAndRender(filtered, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch);
+        }
+
+        function processAndRender(data, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch) {
+            let totalTickets = data.length;
+            let branches = new Set();
+            let picMap = {};
+            let branchSummaryMap = {};
+            let completenessCount = { 'Lengkap': 0, 'Parsial': 0, 'Direct Close': 0 };
+            let totalTimelyTTR = 0, totalTravel = 0, unassignedCount = 0;
+
+            let alignmentGroup = {};
+            let hourlyMap = Array(24).fill(0);
+            let timelyDetailList = [];
+
+            let unassignedBranchMap = {};
+            let unassignedStatusMap = {};
+            let unassignedList = [];
+
+            let timeOfDayMap = { 'Dini Hari': 0, 'Pagi': 0, 'Siang/Sore': 0, 'Malam': 0 };
+            let timePerfMap = {
+                'Dini Hari': { total: 0, ttrTimely: 0, travel: 0 },
+                'Pagi': { total: 0, ttrTimely: 0, travel: 0 },
+                'Siang/Sore': { total: 0, ttrTimely: 0, travel: 0 },
+                'Malam': { total: 0, ttrTimely: 0, travel: 0 }
+            };
+
+            let nationalSLAStats = {
+                s1Total: 0, s1Pass: 0,
+                s2Total: 0, s2Pass: 0,
+                s3Total: 0, s3Pass: 0
+            };
+
+            let milestoneTechMap = {};
+
+            data.forEach(row => {
+                const area = String(row['Area'] || 'Unknown').trim();
+                const regional = String(row['Regional MTEL'] || 'Unknown').trim();
+                const branch = String(row['BRANCH'] || 'Unknown').trim();
+                const timely = row['Timely Report'] || '';
+                const ticketNo = row['Tiket'] || row['Nomor TT'] || row['Ticket Info'] || '-';
+                const nomorTT = row['Nomor TT'] || '-';
+                const openTime = row['Start TT Open Time'] || '-';
+                const status = String(row['Status'] || 'Unknown').trim();
+
+                const pic = extractPIC(timely);
+                const stageRes = parse3StageMilestones(timely);
+                const msDurations = stageRes.durations;
+                const msPass = stageRes.slaPass;
+
+                const comp = checkCompleteness(timely);
+                const timelyDetails = parseTimelyFullDetails(timely, openTime);
+
+                const hr = extractHour(openTime);
+                if (hr >= 0 && hr < 24) {
+                    hourlyMap[hr] += 1;
+                }
+
+                const tod = parseTimeOfDay(openTime);
+                const travel = parseFloat(row['Travel Time (Jam)']) || 0;
+                const resp = parseFloat(row['Time Respons (Jam)']) || 0;
+                const ttr = parseFloat(row['TTR NET (Jam)']) || 0;
+
+                branches.add(branch);
+                completenessCount[comp] = (completenessCount[comp] || 0) + 1;
+                totalTimelyTTR += timelyDetails.durationHours;
+                totalTravel += travel;
+
+                // AGREGASI KINERJA PER BRANCH
+                if (!branchSummaryMap[branch]) {
+                    branchSummaryMap[branch] = {
+                        branch: branch,
+                        area: area,
+                        regional: regional,
+                        tickets: 0,
+                        techs: new Set(),
+                        s1Total: 0, s1Pass: 0,
+                        s2Total: 0, s2Pass: 0,
+                        s3Total: 0, s3Pass: 0
+                    };
+                }
+                branchSummaryMap[branch].tickets += 1;
+                if (pic !== 'Tidak Ada PIC') branchSummaryMap[branch].techs.add(pic);
+
+                if (msDurations.stage1Min !== null) {
+                    branchSummaryMap[branch].s1Total++;
+                    if (msPass.stage1) branchSummaryMap[branch].s1Pass++;
+                }
+                if (msDurations.stage2Min !== null) {
+                    branchSummaryMap[branch].s2Total++;
+                    if (msPass.stage2) branchSummaryMap[branch].s2Pass++;
+                }
+                if (msDurations.stage3Min !== null) {
+                    branchSummaryMap[branch].s3Total++;
+                    if (msPass.stage3) branchSummaryMap[branch].s3Pass++;
+                }
+
+                // ACCUMULATE NATIONAL SLA STATS
+                if (msDurations.stage1Min !== null) {
+                    nationalSLAStats.s1Total++;
+                    if (msPass.stage1) nationalSLAStats.s1Pass++;
+                }
+                if (msDurations.stage2Min !== null) {
+                    nationalSLAStats.s2Total++;
+                    if (msPass.stage2) nationalSLAStats.s2Pass++;
+                }
+                if (msDurations.stage3Min !== null) {
+                    nationalSLAStats.s3Total++;
+                    if (msPass.stage3) nationalSLAStats.s3Pass++;
+                }
+
+                timelyDetailList.push({
+                    pic: pic,
+                    ticket: String(ticketNo),
+                    startTime: timelyDetails.startTimeStr,
+                    lastTime: timelyDetails.lastTimeStr,
+                    duration: timelyDetails.durationHours.toFixed(2)
+                });
+
+                if (timeOfDayMap[tod] !== undefined) {
+                    timeOfDayMap[tod] += 1;
+                    timePerfMap[tod].total += 1;
+                    timePerfMap[tod].ttrTimely += timelyDetails.durationHours;
+                    timePerfMap[tod].travel += travel;
+                }
+
+                const alignKey = `${area}|${regional}|${branch}`;
+                if (!alignmentGroup[alignKey]) {
+                    alignmentGroup[alignKey] = {
+                        area: area,
+                        regional: regional,
+                        branch: branch,
+                        tickets: 0,
+                        pics: new Set(),
+                        hasUnassigned: false
+                    };
+                }
+                alignmentGroup[alignKey].tickets += 1;
+
+                if (pic !== 'Tidak Ada PIC') {
+                    alignmentGroup[alignKey].pics.add(pic);
+
+                    if (!milestoneTechMap[pic]) {
+                        milestoneTechMap[pic] = {
+                            name: pic,
+                            branch: branch,
+                            tickets: 0,
+                            s1Total: 0, s1Pass: 0, s1Mins: [],
+                            s2Total: 0, s2Pass: 0, s2Mins: [],
+                            s3Total: 0, s3Pass: 0, s3Mins: []
+                        };
+                    }
+                    milestoneTechMap[pic].tickets += 1;
+
+                    if (msDurations.stage1Min !== null) {
+                        milestoneTechMap[pic].s1Total++;
+                        if (msPass.stage1) milestoneTechMap[pic].s1Pass++;
+                        milestoneTechMap[pic].s1Mins.push(msDurations.stage1Min);
+                    }
+                    if (msDurations.stage2Min !== null) {
+                        milestoneTechMap[pic].s2Total++;
+                        if (msPass.stage2) milestoneTechMap[pic].s2Pass++;
+                        milestoneTechMap[pic].s2Mins.push(msDurations.stage2Min);
+                    }
+                    if (msDurations.stage3Min !== null) {
+                        milestoneTechMap[pic].s3Total++;
+                        if (msPass.stage3) milestoneTechMap[pic].s3Pass++;
+                        milestoneTechMap[pic].s3Mins.push(msDurations.stage3Min);
+                    }
+
+                } else {
+                    alignmentGroup[alignKey].hasUnassigned = true;
+                    unassignedCount++;
+                    unassignedBranchMap[branch] = (unassignedBranchMap[branch] || 0) + 1;
+                    unassignedStatusMap[status] = (unassignedStatusMap[status] || 0) + 1;
+
+                    unassignedList.push({
+                        ticket: String(ticketNo),
+                        tt: String(nomorTT),
+                        branch: branch,
+                        ttr: ttr.toFixed(2),
+                        status: status
+                    });
+                }
+
+                if (!picMap[pic]) {
+                    picMap[pic] = {
+                        name: pic,
+                        branch: branch,
+                        tickets: 0,
+                        lengkap: 0,
+                        totalResp: 0,
+                        totalTimelyTTR: 0
+                    };
+                }
+                picMap[pic].tickets += 1;
+                if (comp === 'Lengkap') picMap[pic].lengkap += 1;
+                picMap[pic].totalResp += resp;
+                picMap[pic].totalTimelyTTR += timelyDetails.durationHours;
+            });
+
+            // Update KPI Cards
+            document.getElementById('kpiTotalTickets').innerText = totalTickets;
+            document.getElementById('kpiBranchCount').innerText = branches.size + ' Branch Terdeteksi';
+            document.getElementById('kpiTotalPIC').innerText = Object.keys(picMap).filter(k => k !== 'Tidak Ada PIC').length;
+            document.getElementById('kpiUnassigned').innerText = unassignedCount + ' Tiket Tanpa PIC';
+            document.getElementById('unassignedCountBadge').innerText = unassignedCount + ' Tiket';
+
+            // OVERALL NATIONAL SLA RATE
+            const totalTestedStages = nationalSLAStats.s1Total + nationalSLAStats.s2Total + nationalSLAStats.s3Total;
+            const totalPassedStages = nationalSLAStats.s1Pass + nationalSLAStats.s2Pass + nationalSLAStats.s3Pass;
+            const overallSLA = totalTestedStages > 0 ? ((totalPassedStages / totalTestedStages) * 100).toFixed(1) : 0;
+            document.getElementById('kpiTimelyRate').innerText = overallSLA + '%';
+            
+            const avgTimelyTTR = totalTickets > 0 ? (totalTimelyTTR / totalTickets).toFixed(2) : 0;
+            const avgTravel = totalTickets > 0 ? (totalTravel / totalTickets).toFixed(2) : 0;
+            document.getElementById('kpiAvgTimelyTTR').innerText = avgTimelyTTR + ' Jam';
+            document.getElementById('kpiAvgTravel').innerText = 'Travel Time: ' + avgTravel + ' Jam';
+
+            renderDualBranchChartsAndTable(branchSummaryMap, branchSearch);
+            renderMilestoneModule(totalTickets, milestoneTechMap, nationalSLAStats, milestoneSearch);
+
+            renderDailyTrendMatrix(data, dailySearch);
+            renderTimelyDetailTable(timelyDetailList, timelySearch);
+            renderUnassignedCharts(unassignedBranchMap, unassignedStatusMap);
+            renderUnassignedTable(unassignedList, unassignedSearch);
+            renderHourlyChart(hourlyMap);
+            renderTimeCharts(timeOfDayMap, timePerfMap);
+            renderAlignmentTable(alignmentGroup, alignmentSearch);
+            renderMainCharts(picMap, completenessCount);
+            renderTable(picMap, searchKeyword);
+        }
+
+        // RENDER 2 DUAL HORIZONTAL CHARTS (BEST VS WORST PERFORMANCE) & RINCIAN TABEL BRANCH
+        function renderDualBranchChartsAndTable(branchMap, searchKeyword) {
+            const tbody = document.getElementById('branchTableBody');
+            tbody.innerHTML = '';
+
+            let list = Object.values(branchMap);
+
+            list.forEach(item => {
+                const totalTested = item.s1Total + item.s2Total + item.s3Total;
+                const totalPassed = item.s1Pass + item.s2Pass + item.s3Pass;
+                item.successRate = totalTested > 0 ? (totalPassed / totalTested) * 100 : 0;
+
+                item.s1Rate = item.s1Total > 0 ? (item.s1Pass / item.s1Total) * 100 : 0;
+                item.s2Rate = item.s2Total > 0 ? (item.s2Pass / item.s2Total) * 100 : 0;
+                item.s3Rate = item.s3Total > 0 ? (item.s3Pass / item.s3Total) * 100 : 0;
+            });
+
+            // Urutkan dari Success Rate Tertinggi -> Terendah
+            const sortedByRate = [...list].sort((a, b) => b.successRate - a.successRate || a.tickets - b.tickets);
+
+            // Filter TOP 10 BEST & TOP 10 WORST
+            let best10 = sortedByRate.slice(0, 10);
+            let worst10 = sortedByRate.length > 10 ? sortedByRate.slice(-10) : [...sortedByRate].reverse();
+
+            // HELPER UNTUK MENGAMBIL METRIK PENUH (JUMLAH TEKNISI, JUMLAH TIKET, SUCCESS RATE)
+            function buildHorizontalChartConfig(branchList, mainColor, isBest) {
+                const labels = branchList.map(b => b.branch);
+                const techData = branchList.map(b => b.techs.size);
+                const ticketData = branchList.map(b => b.tickets);
+                const rateData = branchList.map(b => parseFloat(b.successRate.toFixed(1)));
+
+                return {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Jumlah Teknisi (Org)',
+                                data: techData,
+                                backgroundColor: '#60a5fa',
+                                borderRadius: 4,
+                                barThickness: 10
+                            },
+                            {
+                                label: 'Jumlah Gangguan (Tiket)',
+                                data: ticketData,
+                                backgroundColor: '#f59e0b',
+                                borderRadius: 4,
+                                barThickness: 10
+                            },
+                            {
+                                label: 'Success Rate (%)',
+                                data: rateData,
+                                backgroundColor: isBest ? '#10b981' : '#f43f5e',
+                                borderRadius: 4,
+                                barThickness: 10
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) label += ': ';
+                                        if (context.parsed.x !== null) {
+                                            label += context.parsed.x + (context.datasetIndex === 2 ? '%' : '');
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#94a3b8', font: { size: 10 } }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: '#ffffff', font: { size: 11, weight: 'bold' } }
+                            }
+                        }
+                    }
+                };
+            }
+
+            // Render Chart LEFT (Top 10 Best)
+            if (chartBestBranchInstance) chartBestBranchInstance.destroy();
+            const ctxBest = document.getElementById('chartBestBranch').getContext('2d');
+            chartBestBranchInstance = new Chart(ctxBest, buildHorizontalChartConfig(best10, '#10b981', true));
+
+            // Render Chart RIGHT (Top 10 Worst)
+            if (chartWorstBranchInstance) chartWorstBranchInstance.destroy();
+            const ctxWorst = document.getElementById('chartWorstBranch').getContext('2d');
+            chartWorstBranchInstance = new Chart(ctxWorst, buildHorizontalChartConfig(worst10, '#f43f5e', false));
+
+            // FILTER TABEL DETAILS
+            if (searchKeyword) {
+                list = list.filter(b => 
+                    b.branch.toLowerCase().includes(searchKeyword) || 
+                    b.area.toLowerCase().includes(searchKeyword) ||
+                    b.regional.toLowerCase().includes(searchKeyword)
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center py-6 text-slate-400">Tidak ada data Branch yang sesuai pencarian.</td></tr>';
+                return;
+            }
+
+            list.sort((a, b) => b.successRate - a.successRate || b.tickets - a.tickets);
+
+            list.forEach((item, index) => {
+                let rateBadge = `<span class="bg-emerald-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.successRate.toFixed(1)}% 🟢</span>`;
+                if (item.successRate < 80 && item.successRate >= 50) {
+                    rateBadge = `<span class="bg-amber-500 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.successRate.toFixed(1)}% 🟡</span>`;
+                } else if (item.successRate < 50) {
+                    rateBadge = `<span class="bg-rose-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.successRate.toFixed(1)}% 🔴</span>`;
+                }
+
+                function formatStageRate(rate, pass, total) {
+                    if (total === 0) return `<span class="text-slate-300 font-mono">-</span>`;
+                    let bg = 'bg-emerald-100 text-emerald-800';
+                    if (rate < 80 && rate >= 50) bg = 'bg-amber-100 text-amber-800';
+                    if (rate < 50) bg = 'bg-rose-100 text-rose-800';
+
+                    return `<span class="px-2 py-0.5 rounded text-[11px] font-bold ${bg}">${rate.toFixed(0)}% (${pass}/${total})</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-center font-bold text-slate-400">${index + 1}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${item.branch}</td>
+                    <td class="py-3 px-3 text-center text-slate-600 font-medium">Area ${item.area}</td>
+                    <td class="py-3 px-3 text-center text-slate-500">${item.regional}</td>
+                    <td class="py-3 px-3 text-center font-semibold text-slate-700">${item.techs.size} Orang</td>
+                    <td class="py-3 px-3 text-center font-bold text-indigo-700">${item.tickets}</td>
+                    <td class="py-3 px-3 text-center">${formatStageRate(item.s1Rate, item.s1Pass, item.s1Total)}</td>
+                    <td class="py-3 px-3 text-center">${formatStageRate(item.s2Rate, item.s2Pass, item.s2Total)}</td>
+                    <td class="py-3 px-3 text-center">${formatStageRate(item.s3Rate, item.s3Pass, item.s3Total)}</td>
+                    <td class="py-3 px-4 text-center bg-indigo-50/60">${rateBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // RENDER MODUL MILESTONE DENGAN SLA SUCCESS RATE PER TEKNISI
+        function renderMilestoneModule(totalTickets, techMap, natStats, searchKeyword) {
+            const activeTechs = Object.values(techMap);
+            const techCount = activeTechs.length;
+
+            document.getElementById('msCardTechCount').innerText = techCount + ' Teknisi';
+            document.getElementById('msCardTicketCount').innerText = totalTickets + ' Tiket';
+
+            function formatMinToHourMin(mins) {
+                if (mins <= 0) return '0 Mnt';
+                if (mins < 60) return Math.round(mins) + ' Mnt';
+                const h = Math.floor(mins / 60);
+                const m = Math.round(mins % 60);
+                return `${h}j ${m}m`;
+            }
+
+            function getAvg(arr) {
+                if (!arr || arr.length === 0) return 0;
+                return arr.reduce((a, b) => a + b, 0) / arr.length;
+            }
+
+            const totalTested = natStats.s1Total + natStats.s2Total + natStats.s3Total;
+            const totalPassed = natStats.s1Pass + natStats.s2Pass + natStats.s3Pass;
+            const natOverallScore = totalTested > 0 ? (totalPassed / totalTested) * 100 : 0;
+            document.getElementById('msCardOverallRate').innerText = natOverallScore.toFixed(1) + '%';
+
+            const s1Pct = natStats.s1Total > 0 ? ((natStats.s1Pass / natStats.s1Total) * 100).toFixed(1) : 0;
+            const s2Pct = natStats.s2Total > 0 ? ((natStats.s2Pass / natStats.s2Total) * 100).toFixed(1) : 0;
+            const s3Pct = natStats.s3Total > 0 ? ((natStats.s3Pass / natStats.s3Total) * 100).toFixed(1) : 0;
+
+            const stagesContainer = document.getElementById('durationStagesContainer');
+            stagesContainer.innerHTML = '';
+
+            const stagesData = [
+                { title: '1. Fast Response (Create -> Prep)', passPct: s1Pct, passCount: natStats.s1Pass, totalCount: natStats.s1Total, subtitle: 'Threshold Max: 15 Menit', color: 'border-blue-300 bg-blue-50/50 text-blue-900' },
+                { title: '2. Mobilisasi & Travel (Prep -> Tiba)', passPct: s2Pct, passCount: natStats.s2Pass, totalCount: natStats.s2Total, subtitle: 'Threshold Max: 1.45 Jam (105m)', color: 'border-cyan-300 bg-cyan-50/50 text-cyan-900' },
+                { title: '3. Troubleshooting (Tiba -> Close)', passPct: s3Pct, passCount: natStats.s3Pass, totalCount: natStats.s3Total, subtitle: 'Threshold Max: 2 Jam (120m)', color: 'border-emerald-300 bg-emerald-50/50 text-emerald-900' }
+            ];
+
+            stagesData.forEach(st => {
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-xl border ${st.color} flex flex-col justify-between text-center shadow-2xs`;
+                card.innerHTML = `
+                    <span class="font-bold text-[11px] uppercase tracking-tight">${st.title}</span>
+                    <div class="my-2">
+                        <span class="text-2xl font-black">${st.passPct}%</span>
+                        <div class="text-[10px] text-slate-500 font-semibold">(${st.passCount} / ${st.totalCount} Tiket Lolos SLA)</div>
+                    </div>
+                    <div class="text-[10px] opacity-75 font-medium">${st.subtitle}</div>
+                `;
+                stagesContainer.appendChild(card);
+            });
+
+            const tbody = document.getElementById('milestoneTableBody');
+            tbody.innerHTML = '';
+
+            let filteredList = activeTechs;
+            if (searchKeyword) {
+                filteredList = activeTechs.filter(t => 
+                    t.name.toLowerCase().includes(searchKeyword) || 
+                    t.branch.toLowerCase().includes(searchKeyword)
+                );
+            }
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada data teknisi yang sesuai pencarian.</td></tr>';
+                return;
+            }
+
+            filteredList.forEach(t => {
+                const totalTestedT = t.s1Total + t.s2Total + t.s3Total;
+                const totalPassedT = t.s1Pass + t.s2Pass + t.s3Pass;
+                t.overallScore = totalTestedT > 0 ? (totalPassedT / totalTestedT) * 100 : 0;
+
+                t.s1Rate = t.s1Total > 0 ? (t.s1Pass / t.s1Total) * 100 : 0;
+                t.s2Rate = t.s2Total > 0 ? (t.s2Pass / t.s2Total) * 100 : 0;
+                t.s3Rate = t.s3Total > 0 ? (t.s3Pass / t.s3Total) * 100 : 0;
+
+                t.avgS1 = getAvg(t.s1Mins);
+                t.avgS2 = getAvg(t.s2Mins);
+                t.avgS3 = getAvg(t.s3Mins);
+            });
+
+            filteredList.sort((a, b) => b.overallScore - a.overallScore || b.tickets - a.tickets);
+
+            filteredList.forEach((item, index) => {
+                let scoreBadge = `<span class="bg-emerald-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.overallScore.toFixed(1)}% 🟢</span>`;
+                if (item.overallScore < 80 && item.overallScore >= 50) {
+                    scoreBadge = `<span class="bg-amber-500 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.overallScore.toFixed(1)}% 🟡</span>`;
+                } else if (item.overallScore < 50) {
+                    scoreBadge = `<span class="bg-rose-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.overallScore.toFixed(1)}% 🔴</span>`;
+                }
+
+                function getStageBadge(rate, pass, total, avgMin) {
+                    if (total === 0) return `<span class="text-slate-300 font-mono">-</span>`;
+                    let bg = 'bg-emerald-100 text-emerald-800';
+                    if (rate < 80 && rate >= 50) bg = 'bg-amber-100 text-amber-800';
+                    if (rate < 50) bg = 'bg-rose-100 text-rose-800';
+
+                    return `
+                        <div class="flex flex-col items-center justify-center">
+                            <span class="font-bold font-mono text-slate-800 text-xs">${formatMinToHourMin(avgMin)}</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${bg} mt-0.5">${rate.toFixed(0)}% (${pass}/${total})</span>
+                        </div>
+                    `;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td>
+                    <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+                    <td class="py-2.5 px-3 text-slate-500">${item.branch}</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-blue-700">${item.tickets}</td>
+                    <td class="py-2.5 px-3 text-center">${getStageBadge(item.s1Rate, item.s1Pass, item.s1Total, item.avgS1)}</td>
+                    <td class="py-2.5 px-3 text-center bg-cyan-50/30">${getStageBadge(item.s2Rate, item.s2Pass, item.s2Total, item.avgS2)}</td>
+                    <td class="py-2.5 px-4 text-center bg-emerald-50/40">${getStageBadge(item.s3Rate, item.s3Pass, item.s3Total, item.avgS3)}</td>
+                    <td class="py-2.5 px-4 text-center bg-emerald-50/60">${scoreBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderDailyTrendMatrix(data, searchKeyword) {
+            const datesSet = new Set();
+            const picMap = {};
+
+            data.forEach(row => {
+                const timely = row['Timely Report'] || '';
+                const pic = extractPIC(timely);
+                const date = formatDate(row['Start TT Open Time']);
+                const ticketNo = String(row['Tiket'] || row['Nomor TT'] || '-').trim();
+
+                if (date !== 'Unknown Date') datesSet.add(date);
+
+                if (!picMap[pic]) {
+                    picMap[pic] = {
+                        name: pic,
+                        branch: String(row['BRANCH'] || '-').trim(),
+                        dates: {}
+                    };
+                }
+
+                if (!picMap[pic].dates[date]) {
+                    picMap[pic].dates[date] = [];
+                }
+                picMap[pic].dates[date].push(ticketNo);
+            });
+
+            const sortedDates = Array.from(datesSet).sort();
+            let picList = Object.values(picMap);
+
+            if (searchKeyword) {
+                picList = picList.filter(p => 
+                    p.name.toLowerCase().includes(searchKeyword) || 
+                    p.branch.toLowerCase().includes(searchKeyword)
+                );
+            }
+
+            const header = document.getElementById('dailyMatrixHeader');
+            let dateThsHTML = sortedDates.map(d => `<th class="py-2.5 px-3 border-r border-b border-slate-200 text-center min-w-[170px] bg-slate-100 font-bold">${d}</th>`).join('');
+
+            header.innerHTML = `
+                <tr>
+                    <th rowspan="2" class="py-3 px-3 w-12 text-center border-r border-b border-slate-200 bg-slate-100 align-middle">No.</th>
+                    <th rowspan="2" class="py-3 px-4 min-w-[220px] border-r border-b border-slate-200 bg-slate-100 align-middle">Teknisi</th>
+                    <th colspan="${sortedDates.length}" class="py-2 px-4 text-center border-b border-slate-200 bg-slate-200/90 text-slate-800 font-bold">Trend Harian</th>
+                </tr>
+                <tr>
+                    ${dateThsHTML}
+                </tr>
+            `;
+
+            const tbody = document.getElementById('dailyMatrixBody');
+            tbody.innerHTML = '';
+
+            if (picList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${sortedDates.length + 2}" class="text-center py-8 text-slate-400">Tidak ada data penugasan harian.</td></tr>`;
+                return;
+            }
+
+            picList.sort((a, b) => {
+                let countA = Object.values(a.dates).reduce((acc, curr) => acc + curr.length, 0);
+                let countB = Object.values(b.dates).reduce((acc, curr) => acc + curr.length, 0);
+                return countB - countA;
+            });
+
+            picList.forEach((item, index) => {
+                let rowTdsHTML = sortedDates.map(d => {
+                    const tickets = item.dates[d];
+                    if (tickets && tickets.length > 0) {
+                        let badges = tickets.map(t => `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded font-mono font-bold text-[11px] whitespace-nowrap shadow-2xs">${t}</span>`).join('');
+                        return `
+                            <td class="p-2 border-r border-slate-200 align-top bg-blue-50/10">
+                                <div class="badge-container flex flex-wrap gap-1.5 justify-center max-h-52 overflow-y-auto p-1">
+                                    ${badges}
+                                </div>
+                            </td>`;
+                    }
+                    return `<td class="py-3 px-3 border-r border-slate-200 text-center text-slate-300 font-mono align-middle">-</td>`;
+                }).join('');
+
+                let displayName = `<span class="font-bold text-slate-800">${item.name}</span><div class="text-[10px] text-slate-400">${item.branch}</div>`;
+                if (item.name === 'Tidak Ada PIC') {
+                    displayName = `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold text-[11px] inline-block">Tidak Ada PIC</span><div class="text-[10px] text-slate-400 mt-0.5">${item.branch}</div>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b border-slate-200';
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-500 align-top">${index + 1}</td>
+                    <td class="py-3 px-4 border-r border-slate-200 align-top">${displayName}</td>
+                    ${rowTdsHTML}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderTimelyDetailTable(list, keyword) {
+            const tbody = document.getElementById('timelyDetailTableBody');
+            tbody.innerHTML = '';
+
+            let filteredList = list;
+            if (keyword) {
+                filteredList = list.filter(item => 
+                    item.pic.toLowerCase().includes(keyword) || 
+                    item.ticket.toLowerCase().includes(keyword) || 
+                    item.startTime.toLowerCase().includes(keyword) ||
+                    item.lastTime.toLowerCase().includes(keyword)
+                );
+            }
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400">Tidak ada rincian TTR Timely Report yang sesuai pencarian.</td></tr>';
+                return;
+            }
+
+            filteredList.forEach(item => {
+                let picTag = `<span class="font-semibold text-slate-800">${item.pic}</span>`;
+                if (item.pic === 'Tidak Ada PIC') {
+                    picTag = `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-md font-bold text-[11px]">Tidak Ada PIC</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-purple-50/40 border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="py-2.5 px-4">${picTag}</td>
+                    <td class="py-2.5 px-4 font-mono font-bold text-blue-700">${item.ticket}</td>
+                    <td class="py-2.5 px-4 text-slate-600 font-mono">${item.startTime}</td>
+                    <td class="py-2.5 px-4 text-slate-700 font-medium">${item.lastTime}</td>
+                    <td class="py-2.5 px-4 text-center font-bold text-purple-800 bg-purple-50/60">${item.duration} Jam</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderHourlyChart(hourlyMap) {
+            const labels = Array.from({length: 24}, (_, i) => String(i).padStart(2, '0') + ':00');
+
+            if (chartHourlyOpenTimeInstance) chartHourlyOpenTimeInstance.destroy();
+            const ctx = document.getElementById('chartHourlyOpenTime').getContext('2d');
+            chartHourlyOpenTimeInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Jumlah TT Open',
+                        data: hourlyMap,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#4f46e5'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+        }
+
+        function renderTimeCharts(todMap, perfMap) {
+            if (chartTimeOfDayInstance) chartTimeOfDayInstance.destroy();
+            const ctx1 = document.getElementById('chartTimeOfDay').getContext('2d');
+            chartTimeOfDayInstance = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Dini Hari (00-06)', 'Pagi (06-12)', 'Siang/Sore (12-18)', 'Malam (18-24)'],
+                    datasets: [{
+                        data: [todMap['Dini Hari'], todMap['Pagi'], todMap['Siang/Sore'], todMap['Malam']],
+                        backgroundColor: ['#6366f1', '#38bdf8', '#f59e0b', '#1e293b']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const times = ['Dini Hari', 'Pagi', 'Siang/Sore', 'Malam'];
+            const avgTTRs = times.map(t => perfMap[t].total > 0 ? (perfMap[t].ttrTimely / perfMap[t].total).toFixed(2) : 0);
+            const avgTravels = times.map(t => perfMap[t].total > 0 ? (perfMap[t].travel / perfMap[t].total).toFixed(2) : 0);
+
+            if (chartTimePerformanceInstance) chartTimePerformanceInstance.destroy();
+            const ctx2 = document.getElementById('chartTimePerformance').getContext('2d');
+            chartTimePerformanceInstance = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: times,
+                    datasets: [
+                        {
+                            label: 'Avg Travel Time (Jam)',
+                            data: avgTravels,
+                            backgroundColor: '#93c5fd',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Avg TTR Timely Log (Jam)',
+                            data: avgTTRs,
+                            backgroundColor: '#a855f7',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderAlignmentTable(alignGroup, keyword) {
+            const tbody = document.getElementById('alignmentTableBody');
+            tbody.innerHTML = '';
+
+            let list = Object.values(alignGroup).sort((a, b) => b.tickets - a.tickets);
+
+            if (keyword) {
+                list = list.filter(item => {
+                    const picsStr = Array.from(item.pics).join(' ').toLowerCase();
+                    return item.area.toLowerCase().includes(keyword) ||
+                           item.regional.toLowerCase().includes(keyword) ||
+                           item.branch.toLowerCase().includes(keyword) ||
+                           picsStr.includes(keyword);
+                });
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">Tidak ada data keselarasan yang sesuai pencarian.</td></tr>';
+                return;
+            }
+
+            list.forEach(item => {
+                const picArray = Array.from(item.pics);
+                const techCount = picArray.length;
+                const ratio = techCount > 0 ? (item.tickets / techCount).toFixed(1) : item.tickets;
+
+                let statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Selaras (Balanced)</span>';
+                if (techCount === 1 && item.tickets >= 5) {
+                    statusBadge = '<span class="bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Monopoli (1 Teknisi)</span>';
+                } else if (ratio > 5) {
+                    statusBadge = '<span class="bg-orange-100 text-orange-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Beban Tinggi</span>';
+                } else if (techCount === 0) {
+                    statusBadge = '<span class="bg-rose-100 text-rose-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Kritis (0 Teknisi)</span>';
+                }
+
+                let techTagsHTML = picArray.map(p => {
+                    const nameShort = p.split(' ')[0] + ' ' + (p.split(' ')[1] || '');
+                    return `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-md text-[11px] font-medium inline-block m-0.5">${nameShort}</span>`;
+                }).join('');
+
+                if (item.hasUnassigned) {
+                    techTagsHTML += `<span class="bg-rose-100 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md text-[11px] font-bold inline-block m-0.5">Ada Unassigned</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-semibold text-slate-700">Area ${item.area}</td>
+                    <td class="py-3 px-4 text-slate-600">${item.regional}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${item.branch}</td>
+                    <td class="py-3 px-4 text-center font-bold text-blue-600 text-sm">${item.tickets}</td>
+                    <td class="py-3 px-4 max-w-md">${techTagsHTML}</td>
+                    <td class="py-3 px-4 text-center">${statusBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderUnassignedCharts(branchMap, statusMap) {
+            const sortedBranches = Object.entries(branchMap)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 6);
+
+            const bLabels = sortedBranches.map(b => b[0]);
+            const bData = sortedBranches.map(b => b[1]);
+
+            if (chartUnassignedBranchInstance) chartUnassignedBranchInstance.destroy();
+            const ctxA = document.getElementById('chartUnassignedBranch').getContext('2d');
+            chartUnassignedBranchInstance = new Chart(ctxA, {
+                type: 'bar',
+                data: {
+                    labels: bLabels,
+                    datasets: [{
+                        label: 'Tiket Tanpa PIC',
+                        data: bData,
+                        backgroundColor: '#f43f5e',
+                        borderRadius: 6
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const sLabels = Object.keys(statusMap);
+            const sData = Object.values(statusMap);
+
+            if (chartUnassignedStatusInstance) chartUnassignedStatusInstance.destroy();
+            const ctxB = document.getElementById('chartUnassignedStatus').getContext('2d');
+            chartUnassignedStatusInstance = new Chart(ctxB, {
+                type: 'pie',
+                data: {
+                    labels: sLabels,
+                    datasets: [{
+                        data: sData,
+                        backgroundColor: ['#fb7185', '#38bdf8', '#a78bfa', '#facc15', '#4ade80']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderUnassignedTable(list, keyword) {
+            const tbody = document.getElementById('unassignedTableBody');
+            tbody.innerHTML = '';
+
+            let filteredList = list;
+            if (keyword) {
+                filteredList = list.filter(item => 
+                    item.ticket.toLowerCase().includes(keyword) || 
+                    item.tt.toLowerCase().includes(keyword) || 
+                    item.branch.toLowerCase().includes(keyword) ||
+                    item.status.toLowerCase().includes(keyword)
+                );
+            }
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-400">Tidak ada tiket tanpa PIC yang sesuai filter.</td></tr>';
+                return;
+            }
+
+            filteredList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-rose-50/50';
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-mono font-bold text-rose-800">${item.ticket}</td>
+                    <td class="py-2.5 px-3 font-mono text-slate-600">${item.tt}</td>
+                    <td class="py-2.5 px-3 font-medium text-slate-700">${item.branch}</td>
+                    <td class="py-2.5 px-3 text-center">${item.ttr}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-semibold text-[10px]">${item.status}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderMainCharts(picMap, completenessCount) {
+            const sortedPICs = Object.values(picMap)
+                .filter(p => p.name !== 'Tidak Ada PIC')
+                .sort((a, b) => b.tickets - a.tickets)
+                .slice(0, 10);
+
+            const labels = sortedPICs.map(p => p.name.split(' ')[0] + ' ' + (p.name.split(' ')[1] || ''));
+            const dataTickets = sortedPICs.map(p => p.tickets);
+
+            if (chartTopPICInstance) chartTopPICInstance.destroy();
+            const ctx1 = document.getElementById('chartTopPIC').getContext('2d');
+            chartTopPICInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Jumlah Tiket',
+                        data: dataTickets,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            if (chartCompletenessInstance) chartCompletenessInstance.destroy();
+            const ctx2 = document.getElementById('chartCompleteness').getContext('2d');
+            chartCompletenessInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Milestone Lengkap', 'Parsial', 'Direct Close / Bypass'],
+                    datasets: [{
+                        data: [completenessCount['Lengkap'], completenessCount['Parsial'], completenessCount['Direct Close']],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderTable(picMap, keyword) {
+            const tbody = document.getElementById('technicianTableBody');
+            tbody.innerHTML = '';
+
+            let list = Object.values(picMap).sort((a, b) => b.tickets - a.tickets);
+
+            if (keyword) {
+                list = list.filter(item => 
+                    item.name.toLowerCase().includes(keyword) || 
+                    item.branch.toLowerCase().includes(keyword)
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">Tidak ada data teknisi yang sesuai pencarian/filter.</td></tr>';
+                return;
+            }
+
+            list.forEach(item => {
+                const avgResp = (item.totalResp / item.tickets).toFixed(2);
+                const avgTimelyTTR = (item.totalTimelyTTR / item.tickets).toFixed(2);
+                const pctLengkap = ((item.lengkap / item.tickets) * 100).toFixed(0);
+
+                let badge = '<span class="bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full text-xs">Efektif</span>';
+                if (item.tickets >= 10) {
+                    badge = '<span class="bg-amber-100 text-amber-700 font-semibold px-2.5 py-1 rounded-full text-xs">Overloaded</span>';
+                } else if (item.name === 'Tidak Ada PIC') {
+                    badge = '<span class="bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full text-xs">Unassigned</span>';
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-100 hover:bg-slate-50/80';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-medium text-slate-800">${item.name}</td>
+                    <td class="py-3 px-4 text-slate-500">${item.branch}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-slate-700">${item.tickets}</td>
+                    <td class="py-3 px-4 text-center">${pctLengkap}% (${item.lengkap})</td>
+                    <td class="py-3 px-4 text-center">${avgResp}</td>
+                    <td class="py-3 px-4 text-center font-bold text-purple-700 bg-purple-50/50">${avgTimelyTTR}</td>
+                    <td class="py-3 px-4 text-center">${badge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
