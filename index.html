@@ -42,7 +42,7 @@
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800">Dashboard Efektivitas & Tren Kinerja Teknisi</h1>
-                <p class="text-sm text-slate-500">Analisa Timely Report, 3 Stage Threshold SLA Success Rate, Top/Worst Branch Performance & Keselarasan Wilayah</p>
+                <p class="text-sm text-slate-500">Analisa Timely Report, SLA Success Rate, Top/Worst Branch, Engineer Skill/Response & Travel Time</p>
             </div>
             
             <div class="flex items-center gap-3">
@@ -120,15 +120,13 @@
                     </select>
                 </div>
 
-                <!-- Filter Kategori Waktu -->
+                <!-- Filter Kategori Waktu (2 Shift) -->
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Shift Waktu:</span>
-                    <select id="timeFilter" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                    <select id="timeFilter" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
                         <option value="ALL">Semua Shift</option>
-                        <option value="Dini Hari">Dini Hari (00:00 - 05:59)</option>
-                        <option value="Pagi">Pagi (06:00 - 11:59)</option>
-                        <option value="Siang/Sore">Siang/Sore (12:00 - 17:59)</option>
-                        <option value="Malam">Malam (18:00 - 23:59)</option>
+                        <option value="Shift-1">Shift-1 (06.00 - 18.00)</option>
+                        <option value="Shift-2">Shift-2 (18.00 - 06.00)</option>
                     </select>
                 </div>
             </div>
@@ -166,6 +164,197 @@
                 <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Rata-Rata TTR Timely Log</p>
                 <h3 id="kpiAvgTimelyTTR" class="text-3xl font-bold text-purple-600 mt-1">0 Jam</h3>
                 <p class="text-xs text-slate-500 mt-1" id="kpiAvgTravel">Travel Time: 0 Jam</p>
+            </div>
+        </div>
+
+        <!-- SEARCH INPUT UNTUK DUA MODUL TEKNISI -->
+        <div class="flex justify-end">
+            <input type="text" id="worstEngineerSearchInput" placeholder="🔍 Cari Nama Teknisi / Branch..." class="text-xs border border-slate-300 bg-white text-slate-800 rounded-xl px-4 py-2.5 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-80 font-medium">
+        </div>
+
+        <!-- MODUL 1A: WORST ENGINEER RESPONSE TIME -->
+        <div class="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 p-6 rounded-3xl border border-rose-800/40 shadow-lg space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-rose-800/30 pb-4">
+                <div>
+                    <h3 class="text-xl font-black text-white flex items-center gap-2">
+                        <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 0 0118 0z"></path></svg>
+                        <span>1. Evaluasi Kategori: Worst Engineer Response Time</span>
+                    </h3>
+                    <p class="text-xs text-rose-200">Menganalisa teknisi dengan rata-rata **Response Time paling lambat** (waktu dari Tiket Dicreate $\rightarrow$ Respon Pertama/Prepare).</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- CHART WORST ENGINEER RESPONSE -->
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-rose-500/20 lg:col-span-1 space-y-3">
+                    <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wide flex items-center justify-between">
+                        <span>⏱️ Top 10 Worst Response Time (Jam)</span>
+                        <span class="text-[10px] text-rose-300 bg-rose-950 px-2 py-0.5 rounded-full border border-rose-800">Paling Lambat</span>
+                    </h4>
+                    <div class="relative h-72">
+                        <canvas id="chartWorstEngineerResponse"></canvas>
+                    </div>
+                </div>
+
+                <!-- TABEL DETAIL WORST RESPONSE TIME -->
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm lg:col-span-2">
+                    <div class="px-4 py-3 bg-rose-100/60 border-b border-rose-200 font-bold text-rose-950 text-xs uppercase flex justify-between items-center">
+                        <span>Rincian Ranking Evaluasi Response Time Teknisi</span>
+                        <span class="text-[10px] text-rose-700 font-medium">*Diurutkan dari Response Time terlama</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-72 custom-scrollbar">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 uppercase font-bold sticky top-0 z-10 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3 text-center">No</th>
+                                    <th class="py-3 px-4 min-w-[160px]">Nama Teknisi</th>
+                                    <th class="py-3 px-3">Branch</th>
+                                    <th class="py-3 px-3 text-center">Total Tiket</th>
+                                    <th class="py-3 px-3 text-center bg-rose-50 text-rose-950 font-black">Avg Response Time (Jam)</th>
+                                    <th class="py-3 px-3 text-center">Kategori Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="worstEngineerResponseTableBody" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="6" class="text-center py-6 text-slate-400">Silakan unggah file Excel untuk melihat evaluasi response time.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODUL 1B: WORST ENGINEER SKILL & EXECUTION INDEX (PARETO CHART) -->
+        <div class="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 p-6 rounded-3xl border border-emerald-800/40 shadow-lg space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-emerald-800/30 pb-4">
+                <div>
+                    <h3 class="text-xl font-black text-white flex items-center gap-2">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span>2. Evaluasi Kategori: Pareto Chart Gagal SLA Stage 3 (Skill Gap)</span>
+                    </h3>
+                    <p class="text-xs text-emerald-200">Analisa Diagram Pareto 80/20: Menampilkan **Jumlah Tiket Gagal SLA Stage 3** ($>120$m) & **Kumulatif % Kontribusi Kegagalan** per Teknisi.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- PARETO CHART WORST ENGINEER SKILL -->
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-emerald-500/20 lg:col-span-1 space-y-3">
+                    <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wide flex items-center justify-between">
+                        <span>📊 Pareto Chart Gagal SLA Stage 3</span>
+                        <span class="text-[10px] text-emerald-300 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800">Aturan 80 / 20</span>
+                    </h4>
+                    <div class="relative h-72">
+                        <canvas id="chartWorstEngineerSkill"></canvas>
+                    </div>
+                </div>
+
+                <!-- TABEL DETAIL WORST SKILL INDEX -->
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm lg:col-span-2">
+                    <div class="px-4 py-3 bg-emerald-100/60 border-b border-emerald-200 font-bold text-emerald-950 text-xs uppercase flex justify-between items-center">
+                        <span>Rincian Ranking Evaluasi Skill & Troubleshoot Index Teknisi</span>
+                        <span class="text-[10px] text-emerald-700 font-medium">*Diurutkan dari Jumlah Tiket Gagal SLA Stage 3 Terbanyak</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-72 custom-scrollbar">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 uppercase font-bold sticky top-0 z-10 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3 text-center">No</th>
+                                    <th class="py-3 px-4 min-w-[160px]">Nama Teknisi</th>
+                                    <th class="py-3 px-3">Branch</th>
+                                    <th class="py-3 px-3 text-center">Lolos Stage 3 SLA</th>
+                                    <th class="py-3 px-3 text-center bg-rose-50 text-rose-900 font-black">Gagal SLA Stage 3 (>120m)</th>
+                                    <th class="py-3 px-3 text-center">Avg Troubleshoot (Stage 3)</th>
+                                    <th class="py-3 px-3 text-center bg-emerald-50 text-emerald-950 font-black">Skill & Execution Index (%)</th>
+                                    <th class="py-3 px-3 text-center">Status Skill</th>
+                                </tr>
+                            </thead>
+                            <tbody id="worstEngineerSkillTableBody" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="8" class="text-center py-6 text-slate-400">Silakan unggah file Excel untuk melihat evaluasi skill index.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODUL 2: WORST BRANCH WITH HIGH TRAVEL TIME -->
+        <div class="bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 p-6 rounded-3xl border border-amber-800/40 shadow-lg space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-amber-800/30 pb-4">
+                <div>
+                    <h3 class="text-xl font-black text-white flex items-center gap-2">
+                        <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span>Worst Branch Analysis: High Travel Time Issue</span>
+                    </h3>
+                    <p class="text-xs text-amber-200">Mengidentifikasi Branch dengan durasi perjalanan (mobilisasi) terlama beserta dampaknya terhadap SLA dan alokasi teknisi.</p>
+                </div>
+                <input type="text" id="worstTravelSearchInput" placeholder="Cari Branch / Area..." class="text-xs border border-amber-700 bg-slate-900 text-white rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 w-full md:w-64">
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- CHART WORST BRANCH TRAVEL TIME -->
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-amber-500/20 lg:col-span-2 space-y-3">
+                    <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wide flex items-center justify-between">
+                        <span>🚗 Top 10 Worst Branch dengan Rata-Rata Travel Time Terlama (Jam)</span>
+                        <span class="text-[10px] text-amber-300 bg-amber-950 px-2 py-0.5 rounded-full border border-amber-800">Isu Mobilisasi</span>
+                    </h4>
+                    <div class="relative h-80">
+                        <canvas id="chartWorstBranchTravelTime"></canvas>
+                    </div>
+                </div>
+
+                <!-- MINI KPI BOX / INSIGHT -->
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-amber-500/20 lg:col-span-1 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wide mb-3">Ringkasan Masalah Travel Time</h4>
+                        <div class="space-y-3">
+                            <div class="bg-amber-950/60 p-3 rounded-xl border border-amber-500/30">
+                                <p class="text-[10px] font-bold text-amber-300 uppercase">Branch Travel Time Terlama</p>
+                                <h5 id="kpiWorstTravelBranch" class="text-lg font-black text-white mt-0.5">-</h5>
+                                <p id="kpiWorstTravelHours" class="text-xs text-amber-200 font-bold mt-1">0 Jam Perjalanan</p>
+                            </div>
+                            <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Rata-Rata Travel Time Nasional</p>
+                                <h5 id="kpiNationalTravelHours" class="text-lg font-black text-blue-400 mt-0.5">0 Jam</h5>
+                                <p class="text-[10px] text-slate-400 mt-1">Threshold Mobilisasi Stage 2: 1.45 Jam</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-amber-200/80 bg-amber-900/30 p-3 rounded-xl border border-amber-700/30 leading-relaxed">
+                        ⚠️ <strong>Rekomendasi Operasional:</strong> Branch dengan Travel Time &gt; 1.5 Jam membutuhkan penambahan titik *basecamp* (sub-branch) atau penataan ulang wilayah kerja penugasan teknisi.
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABEL DETAIL WORST BRANCH TRAVEL TIME -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <div class="px-4 py-3 bg-amber-100/60 border-b border-amber-200 font-bold text-amber-950 text-xs uppercase">
+                    Rincian Kinerja Travel Time Per Branch
+                </div>
+                <div class="overflow-x-auto max-h-72 custom-scrollbar">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-bold sticky top-0 z-10 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-3 text-center">No</th>
+                                <th class="py-3 px-4">Branch</th>
+                                <th class="py-3 px-3 text-center">Area</th>
+                                <th class="py-3 px-3 text-center">Jumlah Teknisi</th>
+                                <th class="py-3 px-3 text-center">Total Tiket</th>
+                                <th class="py-3 px-3 text-center bg-amber-50 text-amber-950">Avg Travel Time (Jam)</th>
+                                <th class="py-3 px-3 text-center">SLA Travel Stage 2 (&lt; 105m)</th>
+                                <th class="py-3 px-3 text-center">Rasio Travel vs Total TTR</th>
+                                <th class="py-3 px-3 text-center">Evaluasi Perjalanan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="worstTravelTableBody" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="9" class="text-center py-6 text-slate-400">Silakan unggah file Excel untuk melihat rincian travel time.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -229,9 +418,9 @@
                                 <th class="py-3 px-3 text-center">Regional MTEL</th>
                                 <th class="py-3 px-3 text-center">Jumlah Teknisi</th>
                                 <th class="py-3 px-3 text-center">Total Tiket</th>
-                                <th class="py-3 px-3 text-center">1. Create -> Prep</th>
-                                <th class="py-3 px-3 text-center">2. Prep -> Tiba</th>
-                                <th class="py-3 px-3 text-center">3. Tiba -> Close</th>
+                                <th class="py-3 px-3 text-center">1. Create -&gt; Prep</th>
+                                <th class="py-3 px-3 text-center">2. Prep -&gt; Tiba</th>
+                                <th class="py-3 px-3 text-center">3. Tiba -&gt; Close</th>
                                 <th class="py-3 px-4 text-center bg-indigo-100/70 text-indigo-950 font-black">Branch SLA Success Rate</th>
                             </tr>
                         </thead>
@@ -253,7 +442,7 @@
                         <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 0 0118 0z"></path></svg>
                         <span>Analisa SLA Success Rate 3 Stage Operasional (Per Teknisi)</span>
                     </h3>
-                    <p class="text-xs text-emerald-800">Threshold: 1. Create -> Prepare (< 15m) | 2. Prepare -> Tiba (< 105m) | 3. Tiba -> Tech Close (< 120m)</p>
+                    <p class="text-xs text-emerald-800">Threshold: 1. Create -&gt; Prepare (&lt; 15m) | 2. Prepare -&gt; Tiba (&lt; 105m) | 3. Tiba -&gt; Tech Close (&lt; 120m)</p>
                 </div>
                 <input type="text" id="milestoneSearchInput" placeholder="Cari Nama Teknisi / Branch..." class="text-xs border border-emerald-300 rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full md:w-64 bg-white shadow-2xs">
             </div>
@@ -301,9 +490,9 @@
                                 <th class="py-3 px-4 min-w-[180px]">Teknisi (PIC)</th>
                                 <th class="py-3 px-3">Branch</th>
                                 <th class="py-3 px-3 text-center">Total TT</th>
-                                <th class="py-3 px-3 text-center" title="Create s/d Prepare (Target <= 15 Min)">1. Create -> Prepare<br><span class="text-[10px] text-slate-400 font-normal">Target < 15m</span></th>
-                                <th class="py-3 px-3 text-center" title="Prepare s/d Tiba (Target <= 1j 45m)">2. Prepare -> Tiba<br><span class="text-[10px] text-slate-400 font-normal">Target < 105m</span></th>
-                                <th class="py-3 px-4 text-center" title="Tiba s/d Tech Close (Target <= 2j)">3. Tiba -> Close<br><span class="text-[10px] text-slate-400 font-normal">Target < 120m</span></th>
+                                <th class="py-3 px-3 text-center" title="Create s/d Prepare (Target <= 15 Min)">1. Create -&gt; Prepare<br><span class="text-[10px] text-slate-400 font-normal">Target &lt; 15m</span></th>
+                                <th class="py-3 px-3 text-center" title="Prepare s/d Tiba (Target <= 1j 45m)">2. Prepare -&gt; Tiba<br><span class="text-[10px] text-slate-400 font-normal">Target &lt; 105m</span></th>
+                                <th class="py-3 px-4 text-center" title="Tiba s/d Tech Close (Target <= 2j)">3. Tiba -&gt; Close<br><span class="text-[10px] text-slate-400 font-normal">Target &lt; 120m</span></th>
                                 <th class="py-3 px-4 text-center bg-emerald-100/70 text-emerald-950 font-black">SLA Success Rate</th>
                             </tr>
                         </thead>
@@ -363,7 +552,7 @@
                             <th class="py-3 px-4">Teknisi (PIC)</th>
                             <th class="py-3 px-4">Nomor Tiket</th>
                             <th class="py-3 px-4">Waktu Tiket di Create</th>
-                            <th class="py-3 px-4">Waktu & Aktivitas Terakhir</th>
+                            <th class="py-3 px-4">Waktu &amp; Aktivitas Terakhir</th>
                             <th class="py-3 px-4 text-center bg-purple-200/50">TTR Timely Report</th>
                         </tr>
                     </thead>
@@ -392,12 +581,12 @@
             </div>
         </div>
 
-        <!-- Section Analisa Waktu Kejadian -->
+        <!-- Section Analisa Waktu Kejadian (Disesuaikan ke 2 Shift) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1 flex flex-col justify-between">
                 <div>
                     <h3 class="text-base font-bold text-slate-800 mb-1">Kategori Shift Kejadian</h3>
-                    <p class="text-xs text-slate-500 mb-4">Pembagian Dini Hari, Pagi, Siang, dan Malam</p>
+                    <p class="text-xs text-slate-500 mb-4">Pembagian Shift-1 (06.00-18.00) dan Shift-2 (18.00-06.00)</p>
                     <div class="relative h-56 flex justify-center">
                         <canvas id="chartTimeOfDay"></canvas>
                     </div>
@@ -419,7 +608,7 @@
                 <div>
                     <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
                         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        <span>Matriks Keselarasan Wilayah & Penugasan Teknisi</span>
+                        <span>Matriks Keselarasan Wilayah &amp; Penugasan Teknisi</span>
                     </h3>
                     <p class="text-xs text-slate-500">Menganalisa rasio kecukupan teknisi berdasarkan Area, Regional MTEL, dan Branch.</p>
                 </div>
@@ -453,7 +642,7 @@
                 <div>
                     <h3 class="text-lg font-bold text-rose-900 flex items-center gap-2">
                         <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        <span>Analisa & Visualisasi Tiket Tanpa PIC</span>
+                        <span>Analisa &amp; Visualisasi Tiket Tanpa PIC</span>
                     </h3>
                     <p class="text-xs text-rose-700">Rincian Nomor Tiket, Wilayah Branch, dan Status Operasional untuk tiket yang tidak memiliki identitas teknisi.</p>
                 </div>
@@ -523,7 +712,7 @@
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h3 class="text-base font-bold text-slate-800">Analisa Efektivitas & Rata-Rata TTR Log Timely Per Teknisi</h3>
+                    <h3 class="text-base font-bold text-slate-800">Analisa Efektivitas &amp; Rata-Rata TTR Log Timely Per Teknisi</h3>
                     <p class="text-xs text-slate-500">Kalkulasi TTR rata-rata per teknisi dari waktu Tiket Dicreate sampai Aktivitas Terakhir</p>
                 </div>
                 <input type="text" id="searchInput" placeholder="Cari Nama Teknisi / Branch..." class="text-sm border border-slate-300 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64">
@@ -568,6 +757,11 @@
         let chartTimePerformanceInstance = null;
         let chartHourlyOpenTimeInstance = null;
 
+        // INSTANCE CHART
+        let chartWorstEngineerResponseInstance = null;
+        let chartWorstEngineerSkillInstance = null;
+        let chartWorstBranchTravelTimeInstance = null;
+
         // SLA THRESHOLD CONSTANTS (IN MINUTES)
         const THRESHOLD_STAGE1_MIN = 15;        // Create -> Prepare (15 Menit)
         const THRESHOLD_STAGE2_MIN = 105;       // Prepare -> Tiba (1.45 Jam = 105 Menit)
@@ -585,6 +779,10 @@
         document.getElementById('timelyDetailSearchInput').addEventListener('input', applyFilters);
         document.getElementById('searchUnassignedInput').addEventListener('input', applyFilters);
         document.getElementById('dailyTrendSearchInput').addEventListener('input', applyFilters);
+
+        // LISTENERS INPUT SEARCH MODUL TEKNISI TERPISAH
+        document.getElementById('worstEngineerSearchInput').addEventListener('input', applyFilters);
+        document.getElementById('worstTravelSearchInput').addEventListener('input', applyFilters);
 
         // DATE DROPDOWN TOGGLE LISTENERS
         const dateDropdownBtn = document.getElementById('dateDropdownBtn');
@@ -865,10 +1063,10 @@
             let hour = extractHour(openTimeString);
             if (hour === -1) return 'Unknown';
 
-            if (hour >= 0 && hour < 6) return 'Dini Hari';
-            if (hour >= 6 && hour < 12) return 'Pagi';
-            if (hour >= 12 && hour < 18) return 'Siang/Sore';
-            return 'Malam';
+            if (hour >= 6 && hour < 18) {
+                return 'Shift-1';
+            }
+            return 'Shift-2';
         }
 
         function populateDropdowns(data) {
@@ -896,7 +1094,6 @@
                 if (row['Status']) statusSet.add(String(row['Status']).trim());
             });
 
-            // POPULATE CHECKBOX FILTER TANGGAL
             Array.from(dateSet).sort().forEach(dt => {
                 selectedDates.add(dt);
                 const div = document.createElement('div');
@@ -1023,6 +1220,9 @@
             const unassignedSearch = document.getElementById('searchUnassignedInput').value.toLowerCase();
             const dailySearch = document.getElementById('dailyTrendSearchInput').value.toLowerCase();
 
+            const worstEngSearch = document.getElementById('worstEngineerSearchInput').value.toLowerCase();
+            const worstTravelSearch = document.getElementById('worstTravelSearchInput').value.toLowerCase();
+
             const filtered = baseData.filter(row => {
                 const rowDate = formatDate(row['Start TT Open Time']);
                 const matchesDate = selectedDates.size === 0 || selectedDates.has(rowDate);
@@ -1039,10 +1239,10 @@
                 return matchesDate && matchesArea && matchesRegional && matchesStatus && matchesTime;
             });
 
-            processAndRender(filtered, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch);
+            processAndRender(filtered, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch, worstEngSearch, worstTravelSearch);
         }
 
-        function processAndRender(data, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch) {
+        function processAndRender(data, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch, worstEngSearch, worstTravelSearch) {
             let totalTickets = data.length;
             let branches = new Set();
             let picMap = {};
@@ -1058,12 +1258,10 @@
             let unassignedStatusMap = {};
             let unassignedList = [];
 
-            let timeOfDayMap = { 'Dini Hari': 0, 'Pagi': 0, 'Siang/Sore': 0, 'Malam': 0 };
+            let timeOfDayMap = { 'Shift-1': 0, 'Shift-2': 0 };
             let timePerfMap = {
-                'Dini Hari': { total: 0, ttrTimely: 0, travel: 0 },
-                'Pagi': { total: 0, ttrTimely: 0, travel: 0 },
-                'Siang/Sore': { total: 0, ttrTimely: 0, travel: 0 },
-                'Malam': { total: 0, ttrTimely: 0, travel: 0 }
+                'Shift-1': { total: 0, ttrTimely: 0, travel: 0 },
+                'Shift-2': { total: 0, ttrTimely: 0, travel: 0 }
             };
 
             let nationalSLAStats = {
@@ -1107,7 +1305,6 @@
                 totalTimelyTTR += timelyDetails.durationHours;
                 totalTravel += travel;
 
-                // AGREGASI KINERJA PER BRANCH
                 if (!branchSummaryMap[branch]) {
                     branchSummaryMap[branch] = {
                         branch: branch,
@@ -1117,10 +1314,14 @@
                         techs: new Set(),
                         s1Total: 0, s1Pass: 0,
                         s2Total: 0, s2Pass: 0,
-                        s3Total: 0, s3Pass: 0
+                        s3Total: 0, s3Pass: 0,
+                        totalTravelHours: 0,
+                        totalTTRHours: 0
                     };
                 }
                 branchSummaryMap[branch].tickets += 1;
+                branchSummaryMap[branch].totalTravelHours += travel;
+                branchSummaryMap[branch].totalTTRHours += ttr;
                 if (pic !== 'Tidak Ada PIC') branchSummaryMap[branch].techs.add(pic);
 
                 if (msDurations.stage1Min !== null) {
@@ -1136,7 +1337,6 @@
                     if (msPass.stage3) branchSummaryMap[branch].s3Pass++;
                 }
 
-                // ACCUMULATE NATIONAL SLA STATS
                 if (msDurations.stage1Min !== null) {
                     nationalSLAStats.s1Total++;
                     if (msPass.stage1) nationalSLAStats.s1Pass++;
@@ -1186,12 +1386,14 @@
                             name: pic,
                             branch: branch,
                             tickets: 0,
+                            totalResponseHours: 0,
                             s1Total: 0, s1Pass: 0, s1Mins: [],
                             s2Total: 0, s2Pass: 0, s2Mins: [],
                             s3Total: 0, s3Pass: 0, s3Mins: []
                         };
                     }
                     milestoneTechMap[pic].tickets += 1;
+                    milestoneTechMap[pic].totalResponseHours += resp;
 
                     if (msDurations.stage1Min !== null) {
                         milestoneTechMap[pic].s1Total++;
@@ -1247,7 +1449,6 @@
             document.getElementById('kpiUnassigned').innerText = unassignedCount + ' Tiket Tanpa PIC';
             document.getElementById('unassignedCountBadge').innerText = unassignedCount + ' Tiket';
 
-            // OVERALL NATIONAL SLA RATE
             const totalTestedStages = nationalSLAStats.s1Total + nationalSLAStats.s2Total + nationalSLAStats.s3Total;
             const totalPassedStages = nationalSLAStats.s1Pass + nationalSLAStats.s2Pass + nationalSLAStats.s3Pass;
             const overallSLA = totalTestedStages > 0 ? ((totalPassedStages / totalTestedStages) * 100).toFixed(1) : 0;
@@ -1258,6 +1459,10 @@
             document.getElementById('kpiAvgTimelyTTR').innerText = avgTimelyTTR + ' Jam';
             document.getElementById('kpiAvgTravel').innerText = 'Travel Time: ' + avgTravel + ' Jam';
 
+            // RENDER MODUL VISUALISASI PAKAI PARETO CHART PADA WORST ENGINEER SKILL
+            renderSeparatedWorstEngineerModules(milestoneTechMap, worstEngSearch);
+
+            renderWorstTravelBranchModule(branchSummaryMap, totalTickets, totalTravel, worstTravelSearch);
             renderDualBranchChartsAndTable(branchSummaryMap, branchSearch);
             renderMilestoneModule(totalTickets, milestoneTechMap, nationalSLAStats, milestoneSearch);
 
@@ -1272,7 +1477,347 @@
             renderTable(picMap, searchKeyword);
         }
 
-        // RENDER 2 DUAL HORIZONTAL CHARTS (BEST VS WORST PERFORMANCE) & RINCIAN TABEL BRANCH
+        // =========================================================================
+        // FUNGSI UNTUK PARETO CHART PADA WORST ENGINEER SKILL & EXECUTION
+        // =========================================================================
+        function renderSeparatedWorstEngineerModules(techMap, keyword) {
+            const rawList = Object.values(techMap);
+
+            // 1. KATEGORI RESPONSE TIME
+            let responseList = rawList.map(t => {
+                const avgResp = t.tickets > 0 ? (t.totalResponseHours / t.tickets) : 0;
+                return {
+                    name: t.name,
+                    branch: t.branch,
+                    tickets: t.tickets,
+                    avgResponse: avgResp
+                };
+            });
+
+            responseList.sort((a, b) => b.avgResponse - a.avgResponse);
+            const top10WorstResponse = responseList.slice(0, 10);
+
+            // 2. KATEGORI SKILL & EXECUTION (KALKULASI PAKAI PARETO GAGAL SLA STAGE 3)
+            let skillList = rawList.map(t => {
+                function getAvg(arr) { return arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0; }
+                const avgStage3Min = getAvg(t.s3Mins);
+                const skillIndex = t.s3Total > 0 ? ((t.s3Pass / t.s3Total) * 100) : 0;
+                const s3Fail = t.s3Total - t.s3Pass; // Tiket gagal SLA Stage 3 (>120m)
+
+                return {
+                    name: t.name,
+                    branch: t.branch,
+                    tickets: t.tickets,
+                    s3Total: t.s3Total,
+                    s3Pass: t.s3Pass,
+                    s3Fail: s3Fail,
+                    avgStage3Min: avgStage3Min,
+                    skillIndex: skillIndex
+                };
+            }).filter(t => t.s3Total > 0);
+
+            // Urutkan berdasarkan tiket Gagal SLA Stage 3 terbanyak untuk Pareto
+            skillList.sort((a, b) => b.s3Fail - a.s3Fail || a.skillIndex - b.skillIndex);
+
+            // Hitung total nasional kegagalan Stage 3
+            const totalStage3Failures = skillList.reduce((sum, item) => sum + item.s3Fail, 0);
+
+            let cumSum = 0;
+            const top10ParetoSkill = skillList.slice(0, 10).map(t => {
+                cumSum += t.s3Fail;
+                const cumPct = totalStage3Failures > 0 ? (cumSum / totalStage3Failures) * 100 : 0;
+                return {
+                    ...t,
+                    cumPct: cumPct
+                };
+            });
+
+            // ---------------------------------------------------------------------
+            // A. CHART 1: WORST RESPONSE TIME
+            // ---------------------------------------------------------------------
+            if (chartWorstEngineerResponseInstance) chartWorstEngineerResponseInstance.destroy();
+            const ctx1 = document.getElementById('chartWorstEngineerResponse').getContext('2d');
+            chartWorstEngineerResponseInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: top10WorstResponse.map(t => t.name.split(' ')[0] + ' ' + (t.name.split(' ')[1] || '')),
+                    datasets: [{
+                        label: 'Avg Response Time (Jam)',
+                        data: top10WorstResponse.map(t => parseFloat(t.avgResponse.toFixed(2))),
+                        backgroundColor: '#f43f5e',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#fda4af', font: { size: 10, weight: 'bold' } } },
+                        y: { ticks: { color: '#cbd5e1' } }
+                    }
+                }
+            });
+
+            // TABEL 1: RESPONSE TIME
+            const tbodyResp = document.getElementById('worstEngineerResponseTableBody');
+            tbodyResp.innerHTML = '';
+
+            let filteredResp = responseList;
+            if (keyword) {
+                filteredResp = responseList.filter(t => 
+                    t.name.toLowerCase().includes(keyword) || 
+                    t.branch.toLowerCase().includes(keyword)
+                );
+            }
+
+            if (filteredResp.length === 0) {
+                tbodyResp.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">Tidak ada data teknisi yang sesuai pencarian.</td></tr>';
+            } else {
+                filteredResp.forEach((item, index) => {
+                    let respBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Fast Response</span>';
+                    if (item.avgResponse > 1.5) {
+                        respBadge = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Critical Delay (&gt;1.5 Jam)</span>';
+                    } else if (item.avgResponse > 0.5) {
+                        respBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Moderate Delay</span>';
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 border-b border-slate-100';
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td>
+                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+                        <td class="py-2.5 px-3 text-slate-500">${item.branch}</td>
+                        <td class="py-2.5 px-3 text-center font-semibold text-blue-700">${item.tickets}</td>
+                        <td class="py-2.5 px-3 text-center font-bold text-rose-600 bg-rose-50/50">${item.avgResponse.toFixed(2)} Jam</td>
+                        <td class="py-2.5 px-3 text-center">${respBadge}</td>
+                    `;
+                    tbodyResp.appendChild(tr);
+                });
+            }
+
+            // ---------------------------------------------------------------------
+            // B. CHART 2: PARETO CHART WORST SKILL & EXECUTION
+            // ---------------------------------------------------------------------
+            if (chartWorstEngineerSkillInstance) chartWorstEngineerSkillInstance.destroy();
+            const ctx2 = document.getElementById('chartWorstEngineerSkill').getContext('2d');
+            chartWorstEngineerSkillInstance = new Chart(ctx2, {
+                data: {
+                    labels: top10ParetoSkill.map(t => t.name.split(' ')[0] + ' ' + (t.name.split(' ')[1] || '')),
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Kumulatif Gagal SLA (%)',
+                            data: top10ParetoSkill.map(t => parseFloat(t.cumPct.toFixed(1))),
+                            borderColor: '#f59e0b',
+                            backgroundColor: '#f59e0b',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#f59e0b',
+                            yAxisID: 'y1',
+                            tension: 0.2
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Jumlah Tiket Gagal Stage 3 (>120m)',
+                            data: top10ParetoSkill.map(t => t.s3Fail),
+                            backgroundColor: '#10b981',
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        return ` Kumulatif Gagal: ${context.parsed.y}%`;
+                                    }
+                                    return ` Tiket Gagal Stage 3: ${context.parsed.y} Tiket`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#a7f3d0', font: { size: 10, weight: 'bold' } } },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            beginAtZero: true,
+                            title: { display: true, text: 'Tiket Gagal SLA', color: '#10b981', font: { size: 10 } },
+                            ticks: { color: '#cbd5e1', precision: 0 }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            min: 0,
+                            max: 100,
+                            title: { display: true, text: 'Kumulatif %', color: '#f59e0b', font: { size: 10 } },
+                            ticks: {
+                                color: '#fde68a',
+                                callback: function(value) { return value + '%'; }
+                            },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+
+            // TABEL 2: DETAIL SKILL INDEX
+            const tbodySkill = document.getElementById('worstEngineerSkillTableBody');
+            tbodySkill.innerHTML = '';
+
+            let filteredSkill = skillList;
+            if (keyword) {
+                filteredSkill = skillList.filter(t => 
+                    t.name.toLowerCase().includes(keyword) || 
+                    t.branch.toLowerCase().includes(keyword)
+                );
+            }
+
+            if (filteredSkill.length === 0) {
+                tbodySkill.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada data teknisi yang sesuai pencarian.</td></tr>';
+            } else {
+                filteredSkill.forEach((item, index) => {
+                    let skillBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Skill Optimal</span>';
+                    if (item.skillIndex < 40) {
+                        skillBadge = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Low Skill (Perlu Training Urgent)</span>';
+                    } else if (item.skillIndex < 70) {
+                        skillBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Perlu Refreshment Skill</span>';
+                    }
+
+                    function formatMinsToHm(mins) {
+                        if (mins <= 0) return '-';
+                        const h = Math.floor(mins / 60);
+                        const m = Math.round(mins % 60);
+                        return h > 0 ? `${h}j ${m}m` : `${m}m`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 border-b border-slate-100';
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td>
+                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+                        <td class="py-2.5 px-3 text-slate-500">${item.branch}</td>
+                        <td class="py-2.5 px-3 text-center font-semibold text-emerald-700">${item.s3Pass} Tiket</td>
+                        <td class="py-2.5 px-3 text-center font-bold text-rose-600 bg-rose-50/50">${item.s3Fail} Tiket</td>
+                        <td class="py-2.5 px-3 text-center font-medium">${formatMinsToHm(item.avgStage3Min)}</td>
+                        <td class="py-2.5 px-3 text-center font-black text-emerald-800 bg-emerald-50/50">${item.skillIndex.toFixed(1)}%</td>
+                        <td class="py-2.5 px-3 text-center">${skillBadge}</td>
+                    `;
+                    tbodySkill.appendChild(tr);
+                });
+            }
+        }
+
+        function renderWorstTravelBranchModule(branchMap, totalTickets, totalTravelHours, keyword) {
+            let list = Object.values(branchMap);
+
+            list.forEach(b => {
+                b.avgTravel = b.tickets > 0 ? (b.totalTravelHours / b.tickets) : 0;
+                b.avgTTR = b.tickets > 0 ? (b.totalTTRHours / b.tickets) : 0;
+                b.travelRatio = b.avgTTR > 0 ? ((b.avgTravel / b.avgTTR) * 100) : 0;
+                b.stage2TravelRate = b.s2Total > 0 ? ((b.s2Pass / b.s2Total) * 100) : 0;
+            });
+
+            const sortedByWorstTravel = [...list].sort((a, b) => b.avgTravel - a.avgTravel);
+            const top10WorstTravel = sortedByWorstTravel.slice(0, 10);
+
+            if (sortedByWorstTravel.length > 0) {
+                const worstB = sortedByWorstTravel[0];
+                document.getElementById('kpiWorstTravelBranch').innerText = worstB.branch + ` (Area ${worstB.area})`;
+                document.getElementById('kpiWorstTravelHours').innerText = worstB.avgTravel.toFixed(2) + ' Jam Perjalanan';
+            }
+            const natAvgTravel = totalTickets > 0 ? (totalTravelHours / totalTickets).toFixed(2) : 0;
+            document.getElementById('kpiNationalTravelHours').innerText = natAvgTravel + ' Jam';
+
+            if (chartWorstBranchTravelTimeInstance) chartWorstBranchTravelTimeInstance.destroy();
+            const ctx = document.getElementById('chartWorstBranchTravelTime').getContext('2d');
+            chartWorstBranchTravelTimeInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: top10WorstTravel.map(b => b.branch),
+                    datasets: [
+                        {
+                            label: 'Avg Travel Time (Jam)',
+                            data: top10WorstTravel.map(b => parseFloat(b.avgTravel.toFixed(2))),
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'SLA Stage 2 Travel Success Rate (%)',
+                            data: top10WorstTravel.map(b => parseFloat(b.stage2TravelRate.toFixed(1))),
+                            backgroundColor: '#38bdf8',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#fde68a', font: { size: 11, weight: 'bold' } } },
+                        y: { ticks: { color: '#cbd5e1' } }
+                    }
+                }
+            });
+
+            const tbody = document.getElementById('worstTravelTableBody');
+            tbody.innerHTML = '';
+
+            let filteredList = list;
+            if (keyword) {
+                filteredList = list.filter(b => 
+                    b.branch.toLowerCase().includes(keyword) || 
+                    b.area.toLowerCase().includes(keyword)
+                );
+            }
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-slate-400">Tidak ada data Branch yang sesuai pencarian.</td></tr>';
+                return;
+            }
+
+            filteredList.sort((a, b) => b.avgTravel - a.avgTravel);
+
+            filteredList.forEach((item, index) => {
+                let travelEval = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Akses Wajar</span>';
+                if (item.avgTravel > 1.75) {
+                    travelEval = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Sangat Jauh / Terisolir</span>';
+                } else if (item.avgTravel > 1.25) {
+                    travelEval = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Tinggi (Mobilisasi Lama)</span>';
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td>
+                    <td class="py-2.5 px-4 font-bold text-slate-800">${item.branch}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-500">Area ${item.area}</td>
+                    <td class="py-2.5 px-3 text-center font-semibold">${item.techs.size} Org</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-blue-700">${item.tickets}</td>
+                    <td class="py-2.5 px-3 text-center font-black text-amber-800 bg-amber-50/50">${item.avgTravel.toFixed(2)} Jam</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-sky-700">${item.stage2TravelRate.toFixed(1)}%</td>
+                    <td class="py-2.5 px-3 text-center font-medium">${item.travelRatio.toFixed(1)}% dari Total TTR</td>
+                    <td class="py-2.5 px-3 text-center">${travelEval}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         function renderDualBranchChartsAndTable(branchMap, searchKeyword) {
             const tbody = document.getElementById('branchTableBody');
             tbody.innerHTML = '';
@@ -1289,14 +1834,11 @@
                 item.s3Rate = item.s3Total > 0 ? (item.s3Pass / item.s3Total) * 100 : 0;
             });
 
-            // Urutkan dari Success Rate Tertinggi -> Terendah
             const sortedByRate = [...list].sort((a, b) => b.successRate - a.successRate || a.tickets - b.tickets);
 
-            // Filter TOP 10 BEST & TOP 10 WORST
             let best10 = sortedByRate.slice(0, 10);
             let worst10 = sortedByRate.length > 10 ? sortedByRate.slice(-10) : [...sortedByRate].reverse();
 
-            // HELPER UNTUK MENGAMBIL METRIK PENUH (JUMLAH TEKNISI, JUMLAH TIKET, SUCCESS RATE)
             function buildHorizontalChartConfig(branchList, mainColor, isBest) {
                 const labels = branchList.map(b => b.branch);
                 const techData = branchList.map(b => b.techs.size);
@@ -1366,17 +1908,14 @@
                 };
             }
 
-            // Render Chart LEFT (Top 10 Best)
             if (chartBestBranchInstance) chartBestBranchInstance.destroy();
             const ctxBest = document.getElementById('chartBestBranch').getContext('2d');
             chartBestBranchInstance = new Chart(ctxBest, buildHorizontalChartConfig(best10, '#10b981', true));
 
-            // Render Chart RIGHT (Top 10 Worst)
             if (chartWorstBranchInstance) chartWorstBranchInstance.destroy();
             const ctxWorst = document.getElementById('chartWorstBranch').getContext('2d');
             chartWorstBranchInstance = new Chart(ctxWorst, buildHorizontalChartConfig(worst10, '#f43f5e', false));
 
-            // FILTER TABEL DETAILS
             if (searchKeyword) {
                 list = list.filter(b => 
                     b.branch.toLowerCase().includes(searchKeyword) || 
@@ -1427,7 +1966,6 @@
             });
         }
 
-        // RENDER MODUL MILESTONE DENGAN SLA SUCCESS RATE PER TEKNISI
         function renderMilestoneModule(totalTickets, techMap, natStats, searchKeyword) {
             const activeTechs = Object.values(techMap);
             const techCount = activeTechs.length;
@@ -1719,16 +2257,16 @@
             chartTimeOfDayInstance = new Chart(ctx1, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Dini Hari (00-06)', 'Pagi (06-12)', 'Siang/Sore (12-18)', 'Malam (18-24)'],
+                    labels: ['Shift-1 (06.00 - 18.00)', 'Shift-2 (18.00 - 06.00)'],
                     datasets: [{
-                        data: [todMap['Dini Hari'], todMap['Pagi'], todMap['Siang/Sore'], todMap['Malam']],
-                        backgroundColor: ['#6366f1', '#38bdf8', '#f59e0b', '#1e293b']
+                        data: [todMap['Shift-1'], todMap['Shift-2']],
+                        backgroundColor: ['#38bdf8', '#1e293b']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            const times = ['Dini Hari', 'Pagi', 'Siang/Sore', 'Malam'];
+            const times = ['Shift-1', 'Shift-2'];
             const avgTTRs = times.map(t => perfMap[t].total > 0 ? (perfMap[t].ttrTimely / perfMap[t].total).toFixed(2) : 0);
             const avgTravels = times.map(t => perfMap[t].total > 0 ? (perfMap[t].travel / perfMap[t].total).toFixed(2) : 0);
 
