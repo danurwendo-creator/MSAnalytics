@@ -81,6 +81,52 @@
                     </div>
                 </div>
 
+              <!-- MULTI-SELECT TOGGLE BULAN -->
+                <div class="relative flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Bulan:</span>
+                    <button id="monthDropdownBtn" type="button" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex justify-between items-center gap-1">
+                        <span id="monthDropdownLabel" class="truncate">Semua Bulan</span>
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div id="monthDropdownPanel" class="hidden absolute top-full left-20 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-lg z-50 p-3 space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-xs font-bold text-slate-700">Pilih Bulan</span>
+                            <div class="space-x-1">
+                                <button type="button" id="btnSelectAllMonth" class="text-[10px] text-blue-600 font-bold hover:underline">Semua</button>
+                                <span class="text-slate-300">|</span>
+                                <button type="button" id="btnClearMonth" class="text-[10px] text-rose-600 font-bold hover:underline">Reset</button>
+                            </div>
+                        </div>
+                        <div id="monthCheckboxList" class="max-h-48 overflow-y-auto space-y-1.5 custom-scrollbar text-xs text-slate-700">
+                            <div class="text-slate-400 text-center py-2">Upload Excel dahulu...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MULTI-SELECT TOGGLE TAHUN -->
+                <div class="relative flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Tahun:</span>
+                    <button id="yearDropdownBtn" type="button" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex justify-between items-center gap-1">
+                        <span id="yearDropdownLabel" class="truncate">Semua Tahun</span>
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div id="yearDropdownPanel" class="hidden absolute top-full left-20 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-lg z-50 p-3 space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-xs font-bold text-slate-700">Pilih Tahun</span>
+                            <div class="space-x-1">
+                                <button type="button" id="btnSelectAllYear" class="text-[10px] text-blue-600 font-bold hover:underline">Semua</button>
+                                <span class="text-slate-300">|</span>
+                                <button type="button" id="btnClearYear" class="text-[10px] text-rose-600 font-bold hover:underline">Reset</button>
+                            </div>
+                        </div>
+                        <div id="yearCheckboxList" class="max-h-48 overflow-y-auto space-y-1.5 custom-scrollbar text-xs text-slate-700">
+                            <div class="text-slate-400 text-center py-2">Upload Excel dahulu...</div>
+                        </div>
+                    </div>
+                </div>
+              
                 <!-- Filter Area -->
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Area:</span>
@@ -532,6 +578,62 @@
             </div>
         </div>
 
+        <!-- MODUL MATRIKS TREND HARIAN TEKNISI YANG SERING STOP CLOCK -->
+        <div class="bg-white rounded-2xl border border-amber-200 shadow-sm overflow-hidden bg-gradient-to-r from-amber-50/20 via-white to-white p-6 space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-amber-100 pb-4">
+                <div>
+                    <h3 class="text-base font-bold text-amber-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Matriks Trend Harian Teknisi Yang Sering Request Stop Clock</span>
+                    </h3>
+                    <p class="text-xs text-amber-700">Menganalisa frekuensi request Stop Clock &amp; alasan penundaan yang tercatat pada log <strong>Timely Report</strong>.</p>
+                </div>
+                <input type="text" id="stopClockSearchInput" placeholder="🔍 Cari Nama Teknisi / Branch / Tiket..." class="text-xs border border-amber-300 rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 w-full sm:w-72 bg-white shadow-2xs">
+            </div>
+
+            <!-- GRID DUA KOLOM: DIAGRAM RANKING & TABEL DETAIL MATRIKS -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- DIAGRAM BAR: RANKING TOP 10 TEKNISI FREKUENSI STOP CLOCK -->
+                <div class="bg-slate-900 p-5 rounded-2xl border border-amber-500/30 shadow-md lg:col-span-1 space-y-3">
+                    <div class="flex justify-between items-center border-b border-amber-500/20 pb-2">
+                        <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wide flex items-center justify-between w-full">
+                            <span>⏱️ Ranking Top 10 Request SC</span>
+                            <span class="text-[10px] text-amber-300 bg-amber-950 px-2 py-0.5 rounded-full border border-amber-800 font-normal">Dari Timely Report</span>
+                        </h4>
+                    </div>
+                    <div class="relative h-80">
+                        <canvas id="chartStopClockRanking"></canvas>
+                    </div>
+                </div>
+
+                <!-- TABEL MATRIKS TREND HARIAN STOP CLOCK PER TEKNISI -->
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs lg:col-span-2">
+                    <div class="px-4 py-3 bg-amber-100/60 border-b border-amber-200 font-bold text-amber-950 text-xs uppercase flex justify-between items-center">
+                        <span>Rincian Matriks Trend Harian Stop Clock Per Teknisi</span>
+                        <span class="text-[10px] text-amber-800 font-medium">*Diurutkan dari frekuensi request SC terbanyak</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-[450px] relative custom-scrollbar">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead id="stopClockMatrixHeader" class="bg-slate-100 text-slate-800 uppercase border-b border-slate-200 sticky top-0 z-20 font-bold shadow-xs">
+                                <tr>
+                                    <th class="py-3 px-3 w-12 text-center border-r border-b border-slate-200 bg-slate-100">No.</th>
+                                    <th class="py-3 px-4 min-w-[200px] border-r border-b border-slate-200 bg-slate-100">Teknisi</th>
+                                    <th class="py-2 px-4 text-center border-b border-slate-200 bg-slate-200/90 text-slate-800 font-bold">Trend Harian SC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stopClockTableBody" class="divide-y divide-slate-200 text-slate-700 bg-white">
+                                <tr>
+                                    <td colspan="3" class="text-center py-12 text-slate-400">Silakan unggah file Excel data tiket untuk menampilkan matriks stop clock.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- TABEL RINCIAN TTR LOG TIMELY REPORT PER TIKET -->
         <div class="bg-white rounded-2xl border border-purple-200 shadow-sm overflow-hidden bg-gradient-to-r from-purple-50/20 via-white to-white">
             <div class="p-5 border-b border-purple-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -745,6 +847,212 @@
     <script>
         let rawDataset = [];
         let selectedDates = new Set();
+
+        let chartStopClockRankingInstance = null;
+        
+        document.getElementById('stopClockSearchInput').addEventListener('input', applyFilters);
+
+      // ---------------------------------------------------------------------
+        // STATE TAMBAHAN UNTUK BULAN & TAHUN
+        // ---------------------------------------------------------------------
+        let selectedMonths = new Set();
+        let selectedYears = new Set();
+
+        const MONTH_NAMES = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+
+        // ---------------------------------------------------------------------
+        // FUNGSI UTILITY EKSTRAKSI BULAN & TAHUN DARI DATE STRING
+        // ---------------------------------------------------------------------
+        function parseMonthYear(openTimeString) {
+            if (!openTimeString) return { month: null, year: null };
+            let str = String(openTimeString).trim();
+            let match = str.match(/(\d{4})-(\d{2})-(\d{2})|(\d{2})\/(\d{2})\/(\d{4})/);
+            
+            if (match) {
+                if (match[1]) { // Format YYYY-MM-DD
+                    const y = parseInt(match[1], 10);
+                    const m = parseInt(match[2], 10) - 1;
+                    return { month: m, year: y };
+                } else if (match[6]) { // Format DD/MM/YYYY
+                    const y = parseInt(match[6], 10);
+                    const m = parseInt(match[5], 10) - 1;
+                    return { month: m, year: y };
+                }
+            }
+            return { month: null, year: null };
+        }
+
+        // ---------------------------------------------------------------------
+        // EVENT LISTENERS UNTUK DROPDOWN BULAN & TAHUN
+        // ---------------------------------------------------------------------
+        const monthDropdownBtn = document.getElementById('monthDropdownBtn');
+        const monthDropdownPanel = document.getElementById('monthDropdownPanel');
+        const yearDropdownBtn = document.getElementById('yearDropdownBtn');
+        const yearDropdownPanel = document.getElementById('yearDropdownPanel');
+
+        monthDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            monthDropdownPanel.classList.toggle('hidden');
+            dateDropdownPanel.classList.add('hidden');
+            yearDropdownPanel.classList.add('hidden');
+            regDropdownPanel.classList.add('hidden');
+        });
+
+        yearDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            yearDropdownPanel.classList.toggle('hidden');
+            dateDropdownPanel.classList.add('hidden');
+            monthDropdownPanel.classList.add('hidden');
+            regDropdownPanel.classList.add('hidden');
+        });
+
+        // Event handler klik di luar panel untuk menutup semua dropdown
+        document.addEventListener('click', (e) => {
+            if (!regDropdownPanel.contains(e.target) && !regDropdownBtn.contains(e.target)) {
+                regDropdownPanel.classList.add('hidden');
+            }
+            if (!dateDropdownPanel.contains(e.target) && !dateDropdownBtn.contains(e.target)) {
+                dateDropdownPanel.classList.add('hidden');
+            }
+            if (!monthDropdownPanel.contains(e.target) && !monthDropdownBtn.contains(e.target)) {
+                monthDropdownPanel.classList.add('hidden');
+            }
+            if (!yearDropdownPanel.contains(e.target) && !yearDropdownBtn.contains(e.target)) {
+                yearDropdownPanel.classList.add('hidden');
+            }
+        });
+
+        // Select All & Reset - Bulan
+        document.getElementById('btnSelectAllMonth').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.month-checkbox');
+            checkboxes.forEach(cb => { cb.checked = true; selectedMonths.add(parseInt(cb.value, 10)); });
+            updateMonthDropdownLabel();
+            applyFilters();
+        });
+
+        document.getElementById('btnClearMonth').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.month-checkbox');
+            checkboxes.forEach(cb => { cb.checked = false; });
+            selectedMonths.clear();
+            updateMonthDropdownLabel();
+            applyFilters();
+        });
+
+        // Select All & Reset - Tahun
+        document.getElementById('btnSelectAllYear').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.year-checkbox');
+            checkboxes.forEach(cb => { cb.checked = true; selectedYears.add(parseInt(cb.value, 10)); });
+            updateYearDropdownLabel();
+            applyFilters();
+        });
+
+        document.getElementById('btnClearYear').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.year-checkbox');
+            checkboxes.forEach(cb => { cb.checked = false; });
+            selectedYears.clear();
+            updateYearDropdownLabel();
+            applyFilters();
+        });
+
+        // ---------------------------------------------------------------------
+        // UPDATE POPULATE DROPDOWNS (DAPATKAN DAFTAR BULAN & TAHUN >= 2025)
+        // ---------------------------------------------------------------------
+        function populateDropdownsAdditional(data) {
+            const monthCheckboxList = document.getElementById('monthCheckboxList');
+            const yearCheckboxList = document.getElementById('yearCheckboxList');
+            
+            monthCheckboxList.innerHTML = '';
+            yearCheckboxList.innerHTML = '';
+            selectedMonths.clear();
+            selectedYears.clear();
+
+            const monthSet = new Set();
+            const yearSet = new Set();
+
+            data.forEach(row => {
+                const { month, year } = parseMonthYear(row['Start TT Open Time']);
+                if (month !== null) monthSet.add(month);
+                if (year !== null && year >= 2025) yearSet.add(year);
+            });
+
+            // Populate Checkbox Bulan (1-12)
+            Array.from(monthSet).sort((a,b) => a - b).forEach(mIdx => {
+                selectedMonths.add(mIdx);
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2 hover:bg-slate-50 p-1 rounded';
+                div.innerHTML = `
+                    <input type="checkbox" value="${mIdx}" class="month-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
+                    <span class="truncate">${MONTH_NAMES[mIdx]}</span>
+                `;
+                monthCheckboxList.appendChild(div);
+            });
+
+            document.querySelectorAll('.month-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const val = parseInt(e.target.value, 10);
+                    if (e.target.checked) selectedMonths.add(val);
+                    else selectedMonths.delete(val);
+                    updateMonthDropdownLabel();
+                    applyFilters();
+                });
+            });
+            updateMonthDropdownLabel();
+
+            // Populate Checkbox Tahun (2025, 2026, dst.)
+            Array.from(yearSet).sort((a,b) => a - b).forEach(yr => {
+                selectedYears.add(yr);
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2 hover:bg-slate-50 p-1 rounded';
+                div.innerHTML = `
+                    <input type="checkbox" value="${yr}" class="year-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
+                    <span class="truncate">${yr}</span>
+                `;
+                yearCheckboxList.appendChild(div);
+            });
+
+            document.querySelectorAll('.year-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const val = parseInt(e.target.value, 10);
+                    if (e.target.checked) selectedYears.add(val);
+                    else selectedYears.delete(val);
+                    updateYearDropdownLabel();
+                    applyFilters();
+                });
+            });
+            updateYearDropdownLabel();
+        }
+
+        function updateMonthDropdownLabel() {
+            const totalCb = document.querySelectorAll('.month-checkbox').length;
+            const selectedCount = selectedMonths.size;
+            const label = document.getElementById('monthDropdownLabel');
+
+            if (selectedCount === totalCb || totalCb === 0) {
+                label.innerText = 'Semua Bulan';
+            } else if (selectedCount === 0) {
+                label.innerText = 'Tidak Ada Terpilih';
+            } else {
+                label.innerText = `${selectedCount} Bulan Terpilih`;
+            }
+        }
+
+        function updateYearDropdownLabel() {
+            const totalCb = document.querySelectorAll('.year-checkbox').length;
+            const selectedCount = selectedYears.size;
+            const label = document.getElementById('yearDropdownLabel');
+
+            if (selectedCount === totalCb || totalCb === 0) {
+                label.innerText = 'Semua Tahun';
+            } else if (selectedCount === 0) {
+                label.innerText = 'Tidak Ada Terpilih';
+            } else {
+                label.innerText = `${selectedCount} Tahun Terpilih`;
+            }
+        }
+      
         let selectedRegionals = new Set();
 
         let chartBestBranchInstance = null;
@@ -819,15 +1127,6 @@
             dateDropdownPanel.classList.add('hidden');
         });
 
-        document.addEventListener('click', (e) => {
-            if (!regDropdownPanel.contains(e.target) && !regDropdownBtn.contains(e.target)) {
-                regDropdownPanel.classList.add('hidden');
-            }
-            if (!dateDropdownPanel.contains(e.target) && !dateDropdownBtn.contains(e.target)) {
-                dateDropdownPanel.classList.add('hidden');
-            }
-        });
-
         document.getElementById('btnSelectAllRegional').addEventListener('click', () => {
             const checkboxes = document.querySelectorAll('.reg-checkbox');
             checkboxes.forEach(cb => { cb.checked = true; selectedRegionals.add(cb.value); });
@@ -849,14 +1148,19 @@
 
             const reader = new FileReader();
             reader.onload = function(evt) {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                rawDataset = XLSX.utils.sheet_to_json(worksheet);
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    rawDataset = XLSX.utils.sheet_to_json(worksheet);
 
-                populateDropdowns(rawDataset);
-                applyFilters();
+                    populateDropdowns(rawDataset);
+                    applyFilters();
+                } catch (err) {
+                    console.error("Gagal membaca file Excel:", err);
+                    alert("Gagal membaca file Excel.");
+                }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -987,6 +1291,256 @@
             return 'Unknown Date';
         }
 
+        function parseStopClockFromTimely(timelyText) {
+            if (!timelyText || typeof timelyText !== 'string') {
+                return { hasSC: false, scCount: 0, reasons: [] };
+            }
+
+            const lines = timelyText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let scCount = 0;
+            let reasons = [];
+
+            const regexSCWithParen = /request\s+stop\s+clock[^(]*\(([^)]+)\)/gi;
+
+            lines.forEach(line => {
+                const matches = [...line.matchAll(regexSCWithParen)];
+
+                if (matches.length > 0) {
+                    matches.forEach(m => {
+                        scCount++;
+                        const reason = m[1].trim();
+                        if (reason) reasons.push(reason);
+                    });
+                } else if (/request\s+stop\s+clock/gi.test(line)) {
+                    scCount++;
+                }
+            });
+
+            return {
+                hasSC: scCount > 0,
+                scCount: scCount,
+                reasons: reasons
+            };
+        }
+
+        function applyFilters() {
+            if (!rawDataset || rawDataset.length === 0) return;
+
+            const isDedupActive = document.getElementById('dedupToggle').checked;
+            const dedupStatusText = document.getElementById('dedupStatusText');
+
+            let baseData = isDedupActive ? deduplicateDataset(rawDataset) : rawDataset;
+
+            if (isDedupActive) {
+                dedupStatusText.innerText = `Aktif (${baseData.length} Tiket Unik)`;
+                dedupStatusText.className = "text-[10px] text-blue-600 font-semibold";
+            } else {
+                dedupStatusText.innerText = `Mati (${rawDataset.length} Total Transaksi)`;
+                dedupStatusText.className = "text-[10px] text-amber-600 font-semibold";
+            }
+
+            const selectedArea = document.getElementById('areaFilter').value;
+            const selectedStatus = document.getElementById('statusFilter').value;
+            const selectedTime = document.getElementById('timeFilter').value;
+
+            const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+            const branchSearch = document.getElementById('branchSearchInput').value.toLowerCase();
+            const milestoneSearch = document.getElementById('milestoneSearchInput').value.toLowerCase();
+            const alignmentSearch = document.getElementById('alignmentSearchInput').value.toLowerCase();
+            const timelySearch = document.getElementById('timelyDetailSearchInput').value.toLowerCase();
+            const unassignedSearch = document.getElementById('searchUnassignedInput').value.toLowerCase();
+            const dailySearch = document.getElementById('dailyTrendSearchInput').value.toLowerCase();
+
+            const worstEngSearch = document.getElementById('worstEngineerSearchInput').value.toLowerCase();
+            const worstTravelSearch = document.getElementById('worstTravelSearchInput').value.toLowerCase();
+
+            const filtered = baseData.filter(row => {
+                const rowDate = formatDate(row['Start TT Open Time']);
+                const matchesDate = selectedDates.size === 0 || selectedDates.has(rowDate);
+
+                const { month, year } = parseMonthYear(row['Start TT Open Time']);
+                const matchesMonth = selectedMonths.size === 0 || (month !== null && selectedMonths.has(month));
+                const matchesYear = selectedYears.size === 0 || (year !== null && year >= 2025 && selectedYears.has(year));
+
+                const matchesArea = (selectedArea === 'ALL') || (String(row['Area']).trim() === selectedArea);
+                
+                const rowRegional = String(row['Regional MTEL'] || '').trim();
+                const matchesRegional = selectedRegionals.size === 0 || selectedRegionals.has(rowRegional);
+
+                const matchesStatus = (selectedStatus === 'ALL') || (String(row['Status']).trim() === selectedStatus);
+                const tod = parseTimeOfDay(row['Start TT Open Time']);
+                const matchesTime = (selectedTime === 'ALL') || (tod === selectedTime);
+
+                return matchesDate && matchesMonth && matchesYear && matchesArea && matchesRegional && matchesStatus && matchesTime;
+            });
+
+            processAndRender(filtered, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch, worstEngSearch, worstTravelSearch);
+        }
+
+        function renderStopClockModule(data, keyword) {
+            let datesSet = new Set();
+            let scTechMap = {};
+
+            data.forEach(row => {
+                const timely = row['Timely Report'] || '';
+                const pic = extractPIC(timely);
+                const branch = String(row['BRANCH'] || 'Unknown').trim();
+                const ticketNo = String(row['Tiket'] || row['Nomor TT'] || row['Ticket Info'] || '-').trim();
+                const date = formatDate(row['Start TT Open Time']);
+
+                const scData = parseStopClockFromTimely(timely);
+
+                if (date !== 'Unknown Date') datesSet.add(date);
+
+                if (!scTechMap[pic]) {
+                    scTechMap[pic] = {
+                        name: pic,
+                        branch: branch,
+                        totalSCFreq: 0,
+                        scTicketsCount: 0,
+                        dates: {}
+                    };
+                }
+
+                if (scData.hasSC) {
+                    scTechMap[pic].scTicketsCount += 1;
+                    scTechMap[pic].totalSCFreq += scData.scCount;
+
+                    if (!scTechMap[pic].dates[date]) {
+                        scTechMap[pic].dates[date] = [];
+                    }
+
+                    scTechMap[pic].dates[date].push({
+                        ticket: ticketNo,
+                        freq: scData.scCount,
+                        reasons: scData.reasons
+                    });
+                }
+            });
+
+            const sortedDates = Array.from(datesSet).sort();
+            let techList = Object.values(scTechMap);
+
+            if (keyword) {
+                techList = techList.filter(t => 
+                    t.name.toLowerCase().includes(keyword) ||
+                    t.branch.toLowerCase().includes(keyword) ||
+                    Object.values(t.dates).some(dayTickets => 
+                        dayTickets.some(d => d.ticket.toLowerCase().includes(keyword) || d.reasons.some(r => r.toLowerCase().includes(keyword)))
+                    )
+                );
+            }
+
+            // 1. DIAGRAM BAR (RANKING TOP 10)
+            let sortedForChart = [...techList].sort((a, b) => b.totalSCFreq - a.totalSCFreq || b.scTicketsCount - a.scTicketsCount);
+            let top10SC = sortedForChart.slice(0, 10);
+
+            if (chartStopClockRankingInstance) chartStopClockRankingInstance.destroy();
+            const ctxChart = document.getElementById('chartStopClockRanking').getContext('2d');
+            
+            chartStopClockRankingInstance = new Chart(ctxChart, {
+                type: 'bar',
+                data: {
+                    labels: top10SC.map(t => t.name.split(' ')[0] + ' ' + (t.name.split(' ')[1] || '')),
+                    datasets: [
+                        {
+                            label: 'Freq Req SC (Kali)',
+                            data: top10SC.map(t => t.totalSCFreq),
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Tiket Terkena SC',
+                            data: top10SC.map(t => t.scTicketsCount),
+                            backgroundColor: '#ef4444',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: '#fef3c7', font: { size: 10, weight: 'bold' } }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#fde68a', font: { size: 10, weight: 'bold' } } },
+                        y: { ticks: { color: '#cbd5e1' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // 2. TABEL MATRIKS HARIAN
+            const header = document.getElementById('stopClockMatrixHeader');
+            let dateThsHTML = sortedDates.map(d => `<th class="py-2.5 px-3 border-r border-b border-slate-200 text-center min-w-[200px] bg-amber-100/60 text-amber-950 font-bold">${d}</th>`).join('');
+
+            header.innerHTML = `
+                <tr>
+                    <th rowspan="2" class="py-3 px-3 w-12 text-center border-r border-b border-slate-200 bg-amber-100/80 text-amber-950 align-middle">No.</th>
+                    <th rowspan="2" class="py-3 px-4 min-w-[200px] border-r border-b border-slate-200 bg-amber-100/80 text-amber-950 align-middle">Teknisi</th>
+                    <th colspan="${sortedDates.length}" class="py-2 px-4 text-center border-b border-slate-200 bg-amber-200/70 text-amber-950 font-bold">Trend Harian Stop Clock</th>
+                </tr>
+                <tr>
+                    ${dateThsHTML}
+                </tr>
+            `;
+
+            const tbody = document.getElementById('stopClockTableBody');
+            tbody.innerHTML = '';
+
+            if (techList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${sortedDates.length + 2}" class="text-center py-8 text-slate-400">Tidak ada log Request Stop Clock pada Timely Report yang sesuai.</td></tr>`;
+                return;
+            }
+
+            techList.sort((a, b) => b.totalSCFreq - a.totalSCFreq || b.scTicketsCount - a.scTicketsCount);
+
+            techList.forEach((item, index) => {
+                let rowTdsHTML = sortedDates.map(d => {
+                    const scEntries = item.dates[d];
+                    if (scEntries && scEntries.length > 0) {
+                        let badges = scEntries.map(e => {
+                            let freqTag = `<span class="text-rose-600 font-bold">(${e.freq}x SC)</span>`;
+                            let reasonsHTML = e.reasons.length > 0 ? `<div class="text-[10px] text-slate-500 font-normal leading-tight mt-0.5">${e.reasons.join(' | ')}</div>` : '';
+                            return `
+                                <div class="bg-amber-50 border border-amber-300 p-1.5 rounded-lg mb-1 text-left shadow-2xs">
+                                    <div class="font-mono font-bold text-amber-900 text-[11px] flex items-center justify-between">
+                                        <span>${e.ticket}</span>
+                                        ${freqTag}
+                                    </div>
+                                    ${reasonsHTML}
+                                </div>`;
+                        }).join('');
+
+                        return `
+                            <td class="p-2 border-r border-slate-200 align-top bg-amber-50/10">
+                                <div class="badge-container max-h-56 overflow-y-auto pr-1">
+                                    ${badges}
+                                </div>
+                            </td>`;
+                    }
+                    return `<td class="py-3 px-3 border-r border-slate-200 text-center text-slate-300 font-mono align-middle">-</td>`;
+                }).join('');
+
+                let displayName = `<span class="font-bold text-slate-800">${item.name}</span><div class="text-[10px] text-slate-400">${item.branch}</div>`;
+                if (item.name === 'Tidak Ada PIC') {
+                    displayName = `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold text-[11px] inline-block">Tidak Ada PIC</span><div class="text-[10px] text-slate-400 mt-0.5">${item.branch}</div>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b border-slate-200';
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-500 align-top">${index + 1}</td>
+                    <td class="py-3 px-4 border-r border-slate-200 align-top">${displayName}</td>
+                    ${rowTdsHTML}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         function parseTimelyFullDetails(timelyText, openTimeFallback) {
             if (!timelyText || typeof timelyText !== 'string') {
                 return {
@@ -1094,6 +1648,8 @@
                 if (row['Status']) statusSet.add(String(row['Status']).trim());
             });
 
+            populateDropdownsAdditional(data);
+
             Array.from(dateSet).sort().forEach(dt => {
                 selectedDates.add(dt);
                 const div = document.createElement('div');
@@ -1190,56 +1746,6 @@
             } else {
                 label.innerText = `${selectedCount} Regional Terpilih`;
             }
-        }
-
-        function applyFilters() {
-            if (!rawDataset || rawDataset.length === 0) return;
-
-            const isDedupActive = document.getElementById('dedupToggle').checked;
-            const dedupStatusText = document.getElementById('dedupStatusText');
-
-            let baseData = isDedupActive ? deduplicateDataset(rawDataset) : rawDataset;
-
-            if (isDedupActive) {
-                dedupStatusText.innerText = `Aktif (${baseData.length} Tiket Unik)`;
-                dedupStatusText.className = "text-[10px] text-blue-600 font-semibold";
-            } else {
-                dedupStatusText.innerText = `Mati (${rawDataset.length} Total Transaksi)`;
-                dedupStatusText.className = "text-[10px] text-amber-600 font-semibold";
-            }
-
-            const selectedArea = document.getElementById('areaFilter').value;
-            const selectedStatus = document.getElementById('statusFilter').value;
-            const selectedTime = document.getElementById('timeFilter').value;
-
-            const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
-            const branchSearch = document.getElementById('branchSearchInput').value.toLowerCase();
-            const milestoneSearch = document.getElementById('milestoneSearchInput').value.toLowerCase();
-            const alignmentSearch = document.getElementById('alignmentSearchInput').value.toLowerCase();
-            const timelySearch = document.getElementById('timelyDetailSearchInput').value.toLowerCase();
-            const unassignedSearch = document.getElementById('searchUnassignedInput').value.toLowerCase();
-            const dailySearch = document.getElementById('dailyTrendSearchInput').value.toLowerCase();
-
-            const worstEngSearch = document.getElementById('worstEngineerSearchInput').value.toLowerCase();
-            const worstTravelSearch = document.getElementById('worstTravelSearchInput').value.toLowerCase();
-
-            const filtered = baseData.filter(row => {
-                const rowDate = formatDate(row['Start TT Open Time']);
-                const matchesDate = selectedDates.size === 0 || selectedDates.has(rowDate);
-
-                const matchesArea = (selectedArea === 'ALL') || (String(row['Area']).trim() === selectedArea);
-                
-                const rowRegional = String(row['Regional MTEL'] || '').trim();
-                const matchesRegional = selectedRegionals.size === 0 || selectedRegionals.has(rowRegional);
-
-                const matchesStatus = (selectedStatus === 'ALL') || (String(row['Status']).trim() === selectedStatus);
-                const tod = parseTimeOfDay(row['Start TT Open Time']);
-                const matchesTime = (selectedTime === 'ALL') || (tod === selectedTime);
-
-                return matchesDate && matchesArea && matchesRegional && matchesStatus && matchesTime;
-            });
-
-            processAndRender(filtered, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch, worstEngSearch, worstTravelSearch);
         }
 
         function processAndRender(data, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch, worstEngSearch, worstTravelSearch) {
@@ -1459,9 +1965,8 @@
             document.getElementById('kpiAvgTimelyTTR').innerText = avgTimelyTTR + ' Jam';
             document.getElementById('kpiAvgTravel').innerText = 'Travel Time: ' + avgTravel + ' Jam';
 
-            // RENDER MODUL VISUALISASI PAKAI PARETO CHART PADA WORST ENGINEER SKILL
+            renderStopClockModule(data, document.getElementById('stopClockSearchInput').value.toLowerCase());
             renderSeparatedWorstEngineerModules(milestoneTechMap, worstEngSearch);
-
             renderWorstTravelBranchModule(branchSummaryMap, totalTickets, totalTravel, worstTravelSearch);
             renderDualBranchChartsAndTable(branchSummaryMap, branchSearch);
             renderMilestoneModule(totalTickets, milestoneTechMap, nationalSLAStats, milestoneSearch);
@@ -1477,13 +1982,9 @@
             renderTable(picMap, searchKeyword);
         }
 
-        // =========================================================================
-        // FUNGSI UNTUK PARETO CHART PADA WORST ENGINEER SKILL & EXECUTION
-        // =========================================================================
         function renderSeparatedWorstEngineerModules(techMap, keyword) {
             const rawList = Object.values(techMap);
 
-            // 1. KATEGORI RESPONSE TIME
             let responseList = rawList.map(t => {
                 const avgResp = t.tickets > 0 ? (t.totalResponseHours / t.tickets) : 0;
                 return {
@@ -1497,12 +1998,11 @@
             responseList.sort((a, b) => b.avgResponse - a.avgResponse);
             const top10WorstResponse = responseList.slice(0, 10);
 
-            // 2. KATEGORI SKILL & EXECUTION (KALKULASI PAKAI PARETO GAGAL SLA STAGE 3)
             let skillList = rawList.map(t => {
                 function getAvg(arr) { return arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0; }
                 const avgStage3Min = getAvg(t.s3Mins);
                 const skillIndex = t.s3Total > 0 ? ((t.s3Pass / t.s3Total) * 100) : 0;
-                const s3Fail = t.s3Total - t.s3Pass; // Tiket gagal SLA Stage 3 (>120m)
+                const s3Fail = t.s3Total - t.s3Pass;
 
                 return {
                     name: t.name,
@@ -1516,10 +2016,8 @@
                 };
             }).filter(t => t.s3Total > 0);
 
-            // Urutkan berdasarkan tiket Gagal SLA Stage 3 terbanyak untuk Pareto
             skillList.sort((a, b) => b.s3Fail - a.s3Fail || a.skillIndex - b.skillIndex);
 
-            // Hitung total nasional kegagalan Stage 3
             const totalStage3Failures = skillList.reduce((sum, item) => sum + item.s3Fail, 0);
 
             let cumSum = 0;
@@ -1532,9 +2030,6 @@
                 };
             });
 
-            // ---------------------------------------------------------------------
-            // A. CHART 1: WORST RESPONSE TIME
-            // ---------------------------------------------------------------------
             if (chartWorstEngineerResponseInstance) chartWorstEngineerResponseInstance.destroy();
             const ctx1 = document.getElementById('chartWorstEngineerResponse').getContext('2d');
             chartWorstEngineerResponseInstance = new Chart(ctx1, {
@@ -1559,7 +2054,6 @@
                 }
             });
 
-            // TABEL 1: RESPONSE TIME
             const tbodyResp = document.getElementById('worstEngineerResponseTableBody');
             tbodyResp.innerHTML = '';
 
@@ -1596,9 +2090,6 @@
                 });
             }
 
-            // ---------------------------------------------------------------------
-            // B. CHART 2: PARETO CHART WORST SKILL & EXECUTION
-            // ---------------------------------------------------------------------
             if (chartWorstEngineerSkillInstance) chartWorstEngineerSkillInstance.destroy();
             const ctx2 = document.getElementById('chartWorstEngineerSkill').getContext('2d');
             chartWorstEngineerSkillInstance = new Chart(ctx2, {
@@ -1673,7 +2164,6 @@
                 }
             });
 
-            // TABEL 2: DETAIL SKILL INDEX
             const tbodySkill = document.getElementById('worstEngineerSkillTableBody');
             tbodySkill.innerHTML = '';
 
