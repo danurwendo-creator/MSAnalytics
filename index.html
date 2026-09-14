@@ -38,23 +38,21 @@
 
     <div class="max-w-7xl mx-auto space-y-6">
         
-        <!-- Header & File Upload Section -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-slate-800">Dashboard Efektivitas & Tren Kinerja Teknisi</h1>
+                <h1 class="text-2xl font-bold text-slate-800">Dashboard Analisa Efektivitas & Tren Kinerja Teknisi</h1>
                 <p class="text-sm text-slate-500">Analisa Timely Report, SLA Success Rate, Top/Worst Branch, Engineer Skill/Response & Travel Time</p>
             </div>
             
             <div class="flex items-center gap-3">
-                <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                <label id="uploadLabel" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <span>Upload File Excel (.xlsx)</span>
+                    <span id="uploadLabelText">Upload File Excel (.xlsx)</span>
                     <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden">
                 </label>
             </div>
         </div>
 
-        <!-- Filter Controls Bar -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                 
@@ -81,7 +79,7 @@
                     </div>
                 </div>
 
-              <!-- MULTI-SELECT TOGGLE BULAN -->
+                <!-- MULTI-SELECT TOGGLE BULAN -->
                 <div class="relative flex items-center gap-2">
                     <span class="text-xs font-bold text-slate-700 whitespace-nowrap">Bulan:</span>
                     <button id="monthDropdownBtn" type="button" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex justify-between items-center gap-1">
@@ -189,7 +187,6 @@
             </div>
         </div>
 
-        <!-- Summary KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                 <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Tiket Diuji</p>
@@ -213,12 +210,58 @@
             </div>
         </div>
 
-        <!-- SEARCH INPUT UNTUK DUA MODUL TEKNISI -->
+        <div class="bg-gradient-to-br from-white via-slate-50 to-blue-50/40 p-6 rounded-3xl border border-slate-200/70 shadow-lg space-y-4 mt-6 mb-2 relative overflow-hidden group">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 group-hover:opacity-20 transition duration-700 pointer-events-none"></div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 relative z-10">
+                <div>
+                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                        <span class="bg-gradient-to-r from-blue-600 to-orange-500 text-transparent bg-clip-text">Analisis Komparatif: Tren Waktu & Regional</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">Perbandingan beban tiket, jumlah teknisi, serta sebaran regional &amp; branch.</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Unified Time View Toggle -->
+                    <div class="flex items-center gap-1 bg-slate-200/60 p-1 rounded-xl">
+                        <button type="button" id="btnViewDaily" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-600 text-white shadow-xs transition">Harian</button>
+                        <button type="button" id="btnViewWeekly" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition">Mingguan</button>
+                        <button type="button" id="btnViewMonthly" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition">Bulanan</button>
+                    </div>
+
+                    <!-- Drill-down Regional/Branch View Toggle -->
+                    <div class="flex items-center gap-1 bg-slate-200/60 p-1 rounded-xl">
+                        <button type="button" id="btnViewRegional" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-cyan-700 text-white shadow-xs transition">Regional MTEL</button>
+                        <button type="button" id="btnViewBranch" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition">Branch Drilldown</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
+                <div class="bg-white/80 p-4 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase">Teknisi vs Tiket (Periode Waktu)</h4>
+                    </div>
+                    <div class="relative h-80">
+                        <canvas id="chartTeknisiVsTiket"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white/80 p-4 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h4 id="regionalChartTitle" class="text-xs font-bold text-slate-700 uppercase">Regional vs Teknisi &amp; Tiket</h4>
+                    </div>
+                    <div class="relative h-80">
+                        <canvas id="chartRegionalVsTeknisiTiket"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="flex justify-end">
             <input type="text" id="worstEngineerSearchInput" placeholder="🔍 Cari Nama Teknisi / Branch..." class="text-xs border border-slate-300 bg-white text-slate-800 rounded-xl px-4 py-2.5 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-80 font-medium">
         </div>
 
-        <!-- MODUL 1A: WORST ENGINEER RESPONSE TIME -->
         <div class="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 p-6 rounded-3xl border border-rose-800/40 shadow-lg space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-rose-800/30 pb-4">
                 <div>
@@ -226,12 +269,11 @@
                         <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 0 0118 0z"></path></svg>
                         <span>1. Evaluasi Kategori: Worst Engineer Response Time</span>
                     </h3>
-                    <p class="text-xs text-rose-200">Menganalisa teknisi dengan rata-rata **Response Time paling lambat** (waktu dari Tiket Dicreate s/d Respon Pertama/Prepare).</p>
+                    <p class="text-xs text-rose-200">Menganalisa teknisi dengan rata-rata <strong>Response Time paling lambat</strong> (waktu dari Tiket Dicreate s/d Respon Pertama/Prepare).</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- CHART WORST ENGINEER RESPONSE -->
                 <div class="bg-slate-900/80 p-5 rounded-2xl border border-rose-500/20 lg:col-span-1 space-y-3">
                     <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wide flex items-center justify-between">
                         <span>⏱️ Top 10 Worst Response Time (Jam)</span>
@@ -242,7 +284,6 @@
                     </div>
                 </div>
 
-                <!-- TABEL DETAIL WORST RESPONSE TIME -->
                 <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm lg:col-span-2">
                     <div class="px-4 py-3 bg-rose-100/60 border-b border-rose-200 font-bold text-rose-950 text-xs uppercase flex justify-between items-center">
                         <span>Rincian Ranking Evaluasi Response Time Teknisi</span>
@@ -271,7 +312,6 @@
             </div>
         </div>
 
-        <!-- MODUL 1B: WORST ENGINEER SKILL & EXECUTION INDEX (PARETO CHART) -->
         <div class="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 p-6 rounded-3xl border border-emerald-800/40 shadow-lg space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-emerald-800/30 pb-4">
                 <div>
@@ -279,12 +319,11 @@
                         <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         <span>2. Evaluasi Kategori: Pareto Chart Gagal SLA Stage 3 (Skill Gap)</span>
                     </h3>
-                    <p class="text-xs text-emerald-200">Analisa Diagram Pareto 80/20: Menampilkan **Jumlah Tiket Gagal SLA Stage 3** ($>120$m) & **Kumulatif % Kontribusi Kegagalan** per Teknisi.</p>
+                    <p class="text-xs text-emerald-200">Analisa Diagram Pareto 80/20: Menampilkan <strong>Jumlah Tiket Gagal SLA Stage 3</strong> (&gt;120m) &amp; <strong>Kumulatif % Kontribusi Kegagalan</strong> per Teknisi.</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- PARETO CHART WORST ENGINEER SKILL -->
                 <div class="bg-slate-900/80 p-5 rounded-2xl border border-emerald-500/20 lg:col-span-1 space-y-3">
                     <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wide flex items-center justify-between">
                         <span>📊 Pareto Chart Gagal SLA Stage 3</span>
@@ -295,10 +334,9 @@
                     </div>
                 </div>
 
-                <!-- TABEL DETAIL WORST SKILL INDEX -->
                 <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm lg:col-span-2">
                     <div class="px-4 py-3 bg-emerald-100/60 border-b border-emerald-200 font-bold text-emerald-950 text-xs uppercase flex justify-between items-center">
-                        <span>Rincian Ranking Evaluasi Skill & Troubleshoot Index Teknisi</span>
+                        <span>Rincian Ranking Evaluasi Skill &amp; Troubleshoot Index Teknisi</span>
                         <span class="text-[10px] text-emerald-700 font-medium">*Diurutkan dari Jumlah Tiket Gagal SLA Stage 3 Terbanyak</span>
                     </div>
                     <div class="overflow-x-auto max-h-72 custom-scrollbar">
@@ -309,9 +347,9 @@
                                     <th class="py-3 px-4 min-w-[160px]">Nama Teknisi</th>
                                     <th class="py-3 px-3">Branch</th>
                                     <th class="py-3 px-3 text-center">Lolos Stage 3 SLA</th>
-                                    <th class="py-3 px-3 text-center bg-rose-50 text-rose-900 font-black">Gagal SLA Stage 3 (>120m)</th>
+                                    <th class="py-3 px-3 text-center bg-rose-50 text-rose-900 font-black">Gagal SLA Stage 3 (&gt;120m)</th>
                                     <th class="py-3 px-3 text-center">Avg Troubleshoot (Stage 3)</th>
-                                    <th class="py-3 px-3 text-center bg-emerald-50 text-emerald-950 font-black">Skill & Execution Index (%)</th>
+                                    <th class="py-3 px-3 text-center bg-emerald-50 text-emerald-950 font-black">Skill &amp; Execution Index (%)</th>
                                     <th class="py-3 px-3 text-center">Status Skill</th>
                                 </tr>
                             </thead>
@@ -326,7 +364,6 @@
             </div>
         </div>
 
-        <!-- MODUL 2: WORST BRANCH WITH HIGH TRAVEL TIME -->
         <div class="bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 p-6 rounded-3xl border border-amber-800/40 shadow-lg space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-amber-800/30 pb-4">
                 <div>
@@ -340,7 +377,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- CHART WORST BRANCH TRAVEL TIME -->
                 <div class="bg-slate-900/80 p-5 rounded-2xl border border-amber-500/20 lg:col-span-2 space-y-3">
                     <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wide flex items-center justify-between">
                         <span>🚗 Top 10 Worst Branch dengan Rata-Rata Travel Time Terlama (Jam)</span>
@@ -351,7 +387,6 @@
                     </div>
                 </div>
 
-                <!-- MINI KPI BOX / INSIGHT -->
                 <div class="bg-slate-900/80 p-5 rounded-2xl border border-amber-500/20 lg:col-span-1 flex flex-col justify-between space-y-4">
                     <div>
                         <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wide mb-3">Ringkasan Masalah Travel Time</h4>
@@ -369,12 +404,11 @@
                         </div>
                     </div>
                     <div class="text-[11px] text-amber-200/80 bg-amber-900/30 p-3 rounded-xl border border-amber-700/30 leading-relaxed">
-                        ⚠️ <strong>Rekomendasi Operasional:</strong> Branch dengan Travel Time &gt; 1.5 Jam membutuhkan penambahan titik *basecamp* (sub-branch) atau penataan ulang wilayah kerja penugasan teknisi.
+                        ⚠️ <strong>Rekomendasi Operasional:</strong> Branch dengan Travel Time &gt; 1.5 Jam membutuhkan penambahan titik <em>basecamp</em> (sub-branch) atau penataan ulang wilayah kerja penugasan teknisi.
                     </div>
                 </div>
             </div>
 
-            <!-- TABEL DETAIL WORST BRANCH TRAVEL TIME -->
             <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <div class="px-4 py-3 bg-amber-100/60 border-b border-amber-200 font-bold text-amber-950 text-xs uppercase">
                     Rincian Kinerja Travel Time Per Branch
@@ -404,7 +438,6 @@
             </div>
         </div>
 
-        <!-- MODUL SUMMARY VISUAL DIBAGI DUA: TOP 10 BEST & TOP 10 WORST PERFORMANCE BRANCH -->
         <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-lg space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700 pb-4">
                 <div>
@@ -412,17 +445,14 @@
                         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         <span>Comparison Analysis: Top 10 Best vs Top 10 Worst Branch Performance</span>
                     </h3>
-                    <p class="text-xs text-slate-300">Visualisasi metrik gabungan: Jumlah Teknisi (Org), Jumlah Gangguan (Tiket), & Success Rate (%) per Branch.</p>
+                    <p class="text-xs text-slate-300">Visualisasi metrik gabungan: Jumlah Teknisi (Org), Jumlah Gangguan (Tiket), &amp; Success Rate (%) per Branch.</p>
                 </div>
                 <input type="text" id="branchSearchInput" placeholder="Cari Branch..." class="text-xs border border-slate-600 bg-slate-900 text-white rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
             </div>
 
-            <!-- CONTAINER DIBAGI DUA (BEST & WORST PERFORMANCE) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative">
-                <!-- SEPARATOR LINE FOR LARGE SCREENS -->
                 <div class="hidden lg:block absolute inset-y-0 left-1/2 w-0.5 bg-slate-600 transform -translate-x-1/2"></div>
 
-                <!-- LEFT BOX: TOP 10 BEST PERFORMANCE BRANCH -->
                 <div class="bg-slate-900/90 p-5 rounded-2xl border border-emerald-500/30 shadow-md space-y-3">
                     <div class="flex justify-between items-center border-b border-emerald-500/20 pb-2">
                         <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wide flex items-center gap-2">
@@ -435,7 +465,6 @@
                     </div>
                 </div>
 
-                <!-- RIGHT BOX: TOP 10 WORST PERFORMANCE BRANCH -->
                 <div class="bg-slate-900/90 p-5 rounded-2xl border border-rose-500/30 shadow-md space-y-3">
                     <div class="flex justify-between items-center border-b border-rose-500/20 pb-2">
                         <h4 class="text-sm font-bold text-rose-400 uppercase tracking-wide flex items-center gap-2">
@@ -449,7 +478,6 @@
                 </div>
             </div>
 
-            <!-- TABEL SUMMARY PER BRANCH -->
             <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs mt-4">
                 <div class="p-3 bg-slate-100 border-b border-slate-200 font-bold text-slate-700 text-xs uppercase">
                     Rincian Kinerja Seluruh Branch
@@ -480,7 +508,6 @@
             </div>
         </div>
 
-        <!-- MODUL 3 MILESTONE SLA THRESHOLD SUCCESS RATE -->
         <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-6 bg-gradient-to-r from-emerald-50/30 via-white to-white space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -493,7 +520,6 @@
                 <input type="text" id="milestoneSearchInput" placeholder="Cari Nama Teknisi / Branch..." class="text-xs border border-emerald-300 rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full md:w-64 bg-white shadow-2xs">
             </div>
 
-            <!-- Mini Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-emerald-50/80 border border-emerald-200 p-4 rounded-xl flex items-center justify-between">
                     <div>
@@ -518,15 +544,12 @@
                 </div>
             </div>
 
-            <!-- Visual Performance per Stage (Nasional) -->
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-3">
                 <h4 class="text-xs font-bold text-slate-700 uppercase">Pencapaian SLA Threshold Per Stage (Nasional)</h4>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-xs" id="durationStagesContainer">
-                    <!-- Cards injected via JS -->
                 </div>
             </div>
 
-            <!-- Tabel Success Rate & Durasi per Teknisi (3 Milestones) -->
             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
                 <div class="overflow-x-auto max-h-96 custom-scrollbar">
                     <table class="w-full text-left text-xs text-slate-600">
@@ -552,7 +575,6 @@
             </div>
         </div>
 
-        <!-- MATRIKS TREND HARIAN PENUGASAN TIKET PER TEKNISI -->
         <div class="bg-white rounded-2xl border border-blue-200 shadow-sm overflow-hidden bg-gradient-to-r from-blue-50/30 via-white to-white space-y-3 p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
@@ -578,7 +600,6 @@
             </div>
         </div>
 
-        <!-- MODUL MATRIKS TREND HARIAN TEKNISI YANG SERING STOP CLOCK -->
         <div class="bg-white rounded-2xl border border-amber-200 shadow-sm overflow-hidden bg-gradient-to-r from-amber-50/20 via-white to-white p-6 space-y-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-amber-100 pb-4">
                 <div>
@@ -593,9 +614,7 @@
                 <input type="text" id="stopClockSearchInput" placeholder="🔍 Cari Nama Teknisi / Branch / Tiket..." class="text-xs border border-amber-300 rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 w-full sm:w-72 bg-white shadow-2xs">
             </div>
 
-            <!-- GRID DUA KOLOM: DIAGRAM RANKING & TABEL DETAIL MATRIKS -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- DIAGRAM BAR: RANKING TOP 10 TEKNISI FREKUENSI STOP CLOCK -->
                 <div class="bg-slate-900 p-5 rounded-2xl border border-amber-500/30 shadow-md lg:col-span-1 space-y-3">
                     <div class="flex justify-between items-center border-b border-amber-500/20 pb-2">
                         <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wide flex items-center justify-between w-full">
@@ -608,7 +627,6 @@
                     </div>
                 </div>
 
-                <!-- TABEL MATRIKS TREND HARIAN STOP CLOCK PER TEKNISI -->
                 <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs lg:col-span-2">
                     <div class="px-4 py-3 bg-amber-100/60 border-b border-amber-200 font-bold text-amber-950 text-xs uppercase flex justify-between items-center">
                         <span>Rincian Matriks Trend Harian Stop Clock Per Teknisi</span>
@@ -634,7 +652,6 @@
             </div>
         </div>
 
-        <!-- TABEL RINCIAN TTR LOG TIMELY REPORT PER TIKET -->
         <div class="bg-white rounded-2xl border border-purple-200 shadow-sm overflow-hidden bg-gradient-to-r from-purple-50/20 via-white to-white">
             <div class="p-5 border-b border-purple-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
@@ -667,7 +684,6 @@
             </div>
         </div>
 
-        <!-- VISUALISASI SEBARAN JAM OPEN TROUBLE TICKET -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                 <div>
@@ -683,7 +699,6 @@
             </div>
         </div>
 
-        <!-- Section Analisa Waktu Kejadian (Disesuaikan ke 2 Shift) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1 flex flex-col justify-between">
                 <div>
@@ -704,12 +719,11 @@
             </div>
         </div>
 
-        <!-- VISUALISASI MATRIKS KESELARAN AREA -> REGIONAL MTEL -> BRANCH -> TEKNISI -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2h0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                         <span>Matriks Keselarasan Wilayah &amp; Penugasan Teknisi</span>
                     </h3>
                     <p class="text-xs text-slate-500">Menganalisa rasio kecukupan teknisi berdasarkan Area, Regional MTEL, dan Branch.</p>
@@ -738,7 +752,6 @@
             </div>
         </div>
 
-        <!-- Visualisasi Tiket Tanpa PIC Section -->
         <div class="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm bg-gradient-to-r from-rose-50/40 via-white to-white space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                 <div>
@@ -793,7 +806,6 @@
             </div>
         </div>
 
-        <!-- Charts Section 1: Main Performance -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                 <h3 class="text-base font-bold text-slate-800 mb-4">Top 10 Teknisi Berdasarkan Beban Tiket</h3>
@@ -810,7 +822,6 @@
             </div>
         </div>
 
-        <!-- Table Section: Detail Per Kinerja Teknisi -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
@@ -847,123 +858,171 @@
     <script>
         let rawDataset = [];
         let selectedDates = new Set();
-
-        let chartStopClockRankingInstance = null;
-        
-        document.getElementById('stopClockSearchInput').addEventListener('input', applyFilters);
-
-      // ---------------------------------------------------------------------
-        // STATE TAMBAHAN UNTUK BULAN & TAHUN
-        // ---------------------------------------------------------------------
         let selectedMonths = new Set();
         let selectedYears = new Set();
+        let selectedRegionals = new Set();
+        let filterDebounceTimer = null;
+        let currentTeknisiVsTiketView = 'daily'; // 'daily', 'weekly', 'monthly'
+        let currentRegionalDrilldownView = 'regional'; // 'regional', 'branch'
+        let lastFilteredDataForChart = [];
 
         const MONTH_NAMES = [
             "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
             "Juli", "Agustus", "September", "Oktober", "November", "Desember"
         ];
 
-        // ---------------------------------------------------------------------
-        // FUNGSI UTILITY EKSTRAKSI BULAN & TAHUN DARI DATE STRING
-        // ---------------------------------------------------------------------
+        let chartStopClockRankingInstance = null;
+        let chartBestBranchInstance = null;
+        let chartWorstBranchInstance = null;
+        let chartTopPICInstance = null;
+        let chartCompletenessInstance = null;
+        let chartUnassignedBranchInstance = null;
+        let chartUnassignedStatusInstance = null;
+        let chartTimeOfDayInstance = null;
+        let chartTimePerformanceInstance = null;
+        let chartHourlyOpenTimeInstance = null;
+        let chartWorstEngineerResponseInstance = null;
+        let chartWorstEngineerSkillInstance = null;
+        let chartWorstBranchTravelTimeInstance = null;
+        let chartTeknisiVsTiketInstance = null;
+        let chartRegionalVsTeknisiTiketInstance = null;
+
+        const THRESHOLD_STAGE1_MIN = 15;        
+        const THRESHOLD_STAGE2_MIN = 105;       
+        const THRESHOLD_STAGE3_MIN = 120;       
+
+        document.getElementById('excelFileInput').addEventListener('change', handleFileUpload);
+        
+        ['dedupToggle', 'areaFilter', 'statusFilter', 'timeFilter'].forEach(id => {
+            document.getElementById(id).addEventListener('change', triggerDebouncedFilters);
+        });
+        
+        ['searchInput', 'branchSearchInput', 'milestoneSearchInput', 'alignmentSearchInput', 'timelyDetailSearchInput', 'searchUnassignedInput', 'dailyTrendSearchInput', 'worstEngineerSearchInput', 'worstTravelSearchInput', 'stopClockSearchInput'].forEach(id => {
+            document.getElementById(id).addEventListener('input', triggerDebouncedFilters);
+        });
+
+        // Unified View Toggle Buttons for Teknisi vs Tiket & Regional vs Tiket charts
+        const btnViewDaily = document.getElementById('btnViewDaily');
+        const btnViewWeekly = document.getElementById('btnViewWeekly');
+        const btnViewMonthly = document.getElementById('btnViewMonthly');
+
+        function setTeknisiVsTiketView(viewMode) {
+            currentTeknisiVsTiketView = viewMode;
+            [btnViewDaily, btnViewWeekly, btnViewMonthly].forEach(btn => {
+                btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition";
+            });
+            if (viewMode === 'daily') btnViewDaily.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-600 text-white shadow-xs transition";
+            if (viewMode === 'weekly') btnViewWeekly.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-600 text-white shadow-xs transition";
+            if (viewMode === 'monthly') btnViewMonthly.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-600 text-white shadow-xs transition";
+
+            if (lastFilteredDataForChart.length > 0) {
+                renderTeknisiVsTiketChart(lastFilteredDataForChart);
+            }
+        }
+
+        btnViewDaily.addEventListener('click', () => setTeknisiVsTiketView('daily'));
+        btnViewWeekly.addEventListener('click', () => setTeknisiVsTiketView('weekly'));
+        btnViewMonthly.addEventListener('click', () => setTeknisiVsTiketView('monthly'));
+
+        // Regional / Branch Drilldown Toggle
+        const btnViewRegional = document.getElementById('btnViewRegional');
+        const btnViewBranch = document.getElementById('btnViewBranch');
+
+        function setRegionalDrilldownView(viewMode) {
+            currentRegionalDrilldownView = viewMode;
+            [btnViewRegional, btnViewBranch].forEach(btn => {
+                btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition";
+            });
+            if (viewMode === 'regional') {
+                btnViewRegional.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-cyan-700 text-white shadow-xs transition";
+                document.getElementById('regionalChartTitle').innerText = "Regional vs Teknisi & Tiket";
+            } else {
+                btnViewBranch.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-cyan-700 text-white shadow-xs transition";
+                document.getElementById('regionalChartTitle').innerText = "Branch vs Teknisi & Tiket (Drilldown)";
+            }
+
+            if (lastFilteredDataForChart.length > 0) {
+                renderRegionalVsTeknisiTiketChart(lastFilteredDataForChart);
+            }
+        }
+
+        btnViewRegional.addEventListener('click', () => setRegionalDrilldownView('regional'));
+        btnViewBranch.addEventListener('click', () => setRegionalDrilldownView('branch'));
+
+        const dateDropdownBtn = document.getElementById('dateDropdownBtn');
+        const dateDropdownPanel = document.getElementById('dateDropdownPanel');
+        const monthDropdownBtn = document.getElementById('monthDropdownBtn');
+        const monthDropdownPanel = document.getElementById('monthDropdownPanel');
+        const yearDropdownBtn = document.getElementById('yearDropdownBtn');
+        const yearDropdownPanel = document.getElementById('yearDropdownPanel');
+        const regDropdownBtn = document.getElementById('regionalDropdownBtn');
+        const regDropdownPanel = document.getElementById('regionalDropdownPanel');
+
+        dateDropdownBtn.addEventListener('click', (e) => { e.stopPropagation(); dateDropdownPanel.classList.toggle('hidden'); monthDropdownPanel.classList.add('hidden'); yearDropdownPanel.classList.add('hidden'); regDropdownPanel.classList.add('hidden'); });
+        monthDropdownBtn.addEventListener('click', (e) => { e.stopPropagation(); monthDropdownPanel.classList.toggle('hidden'); dateDropdownPanel.classList.add('hidden'); yearDropdownPanel.classList.add('hidden'); regDropdownPanel.classList.add('hidden'); });
+        yearDropdownBtn.addEventListener('click', (e) => { e.stopPropagation(); yearDropdownPanel.classList.toggle('hidden'); dateDropdownPanel.classList.add('hidden'); monthDropdownPanel.classList.add('hidden'); regDropdownPanel.classList.add('hidden'); });
+        regDropdownBtn.addEventListener('click', (e) => { e.stopPropagation(); regDropdownPanel.classList.toggle('hidden'); dateDropdownPanel.classList.add('hidden'); monthDropdownPanel.classList.add('hidden'); yearDropdownPanel.classList.add('hidden'); });
+
+        document.addEventListener('click', () => {
+            dateDropdownPanel.classList.add('hidden');
+            monthDropdownPanel.classList.add('hidden');
+            yearDropdownPanel.classList.add('hidden');
+            regDropdownPanel.classList.add('hidden');
+        });
+
+        document.getElementById('btnSelectAllDate').addEventListener('click', () => {
+            document.querySelectorAll('.date-checkbox').forEach(cb => { cb.checked = true; selectedDates.add(cb.value); });
+            updateDateDropdownLabel(); triggerDebouncedFilters();
+        });
+        document.getElementById('btnClearDate').addEventListener('click', () => {
+            document.querySelectorAll('.date-checkbox').forEach(cb => { cb.checked = false; });
+            selectedDates.clear(); updateDateDropdownLabel(); triggerDebouncedFilters();
+        });
+
+        document.getElementById('btnSelectAllMonth').addEventListener('click', () => {
+            document.querySelectorAll('.month-checkbox').forEach(cb => { cb.checked = true; selectedMonths.add(parseInt(cb.value, 10)); });
+            updateMonthDropdownLabel(); triggerDebouncedFilters();
+        });
+        document.getElementById('btnClearMonth').addEventListener('click', () => {
+            document.querySelectorAll('.month-checkbox').forEach(cb => { cb.checked = false; });
+            selectedMonths.clear(); updateMonthDropdownLabel(); triggerDebouncedFilters();
+        });
+
+        document.getElementById('btnSelectAllYear').addEventListener('click', () => {
+            document.querySelectorAll('.year-checkbox').forEach(cb => { cb.checked = true; selectedYears.add(parseInt(cb.value, 10)); });
+            updateYearDropdownLabel(); triggerDebouncedFilters();
+        });
+        document.getElementById('btnClearYear').addEventListener('click', () => {
+            document.querySelectorAll('.year-checkbox').forEach(cb => { cb.checked = false; });
+            selectedYears.clear(); updateYearDropdownLabel(); triggerDebouncedFilters();
+        });
+
+        document.getElementById('btnSelectAllRegional').addEventListener('click', () => {
+            document.querySelectorAll('.reg-checkbox').forEach(cb => { cb.checked = true; selectedRegionals.add(cb.value); });
+            updateRegionalDropdownLabel(); triggerDebouncedFilters();
+        });
+        document.getElementById('btnClearRegional').addEventListener('click', () => {
+            document.querySelectorAll('.reg-checkbox').forEach(cb => { cb.checked = false; });
+            selectedRegionals.clear(); updateRegionalDropdownLabel(); triggerDebouncedFilters();
+        });
+
         function parseMonthYear(openTimeString) {
             if (!openTimeString) return { month: null, year: null };
             let str = String(openTimeString).trim();
             let match = str.match(/(\d{4})-(\d{2})-(\d{2})|(\d{2})\/(\d{2})\/(\d{4})/);
-            
             if (match) {
-                if (match[1]) { // Format YYYY-MM-DD
-                    const y = parseInt(match[1], 10);
-                    const m = parseInt(match[2], 10) - 1;
-                    return { month: m, year: y };
-                } else if (match[6]) { // Format DD/MM/YYYY
-                    const y = parseInt(match[6], 10);
-                    const m = parseInt(match[5], 10) - 1;
-                    return { month: m, year: y };
+                if (match[1]) {
+                    return { month: parseInt(match[2], 10) - 1, year: parseInt(match[1], 10) };
+                } else if (match[6]) {
+                    return { month: parseInt(match[5], 10) - 1, year: parseInt(match[6], 10) };
                 }
             }
             return { month: null, year: null };
         }
 
-        // ---------------------------------------------------------------------
-        // EVENT LISTENERS UNTUK DROPDOWN BULAN & TAHUN
-        // ---------------------------------------------------------------------
-        const monthDropdownBtn = document.getElementById('monthDropdownBtn');
-        const monthDropdownPanel = document.getElementById('monthDropdownPanel');
-        const yearDropdownBtn = document.getElementById('yearDropdownBtn');
-        const yearDropdownPanel = document.getElementById('yearDropdownPanel');
-
-        monthDropdownBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            monthDropdownPanel.classList.toggle('hidden');
-            dateDropdownPanel.classList.add('hidden');
-            yearDropdownPanel.classList.add('hidden');
-            regDropdownPanel.classList.add('hidden');
-        });
-
-        yearDropdownBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            yearDropdownPanel.classList.toggle('hidden');
-            dateDropdownPanel.classList.add('hidden');
-            monthDropdownPanel.classList.add('hidden');
-            regDropdownPanel.classList.add('hidden');
-        });
-
-        // Event handler klik di luar panel untuk menutup semua dropdown
-        document.addEventListener('click', (e) => {
-            if (!regDropdownPanel.contains(e.target) && !regDropdownBtn.contains(e.target)) {
-                regDropdownPanel.classList.add('hidden');
-            }
-            if (!dateDropdownPanel.contains(e.target) && !dateDropdownBtn.contains(e.target)) {
-                dateDropdownPanel.classList.add('hidden');
-            }
-            if (!monthDropdownPanel.contains(e.target) && !monthDropdownBtn.contains(e.target)) {
-                monthDropdownPanel.classList.add('hidden');
-            }
-            if (!yearDropdownPanel.contains(e.target) && !yearDropdownBtn.contains(e.target)) {
-                yearDropdownPanel.classList.add('hidden');
-            }
-        });
-
-        // Select All & Reset - Bulan
-        document.getElementById('btnSelectAllMonth').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.month-checkbox');
-            checkboxes.forEach(cb => { cb.checked = true; selectedMonths.add(parseInt(cb.value, 10)); });
-            updateMonthDropdownLabel();
-            applyFilters();
-        });
-
-        document.getElementById('btnClearMonth').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.month-checkbox');
-            checkboxes.forEach(cb => { cb.checked = false; });
-            selectedMonths.clear();
-            updateMonthDropdownLabel();
-            applyFilters();
-        });
-
-        // Select All & Reset - Tahun
-        document.getElementById('btnSelectAllYear').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.year-checkbox');
-            checkboxes.forEach(cb => { cb.checked = true; selectedYears.add(parseInt(cb.value, 10)); });
-            updateYearDropdownLabel();
-            applyFilters();
-        });
-
-        document.getElementById('btnClearYear').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.year-checkbox');
-            checkboxes.forEach(cb => { cb.checked = false; });
-            selectedYears.clear();
-            updateYearDropdownLabel();
-            applyFilters();
-        });
-
-        // ---------------------------------------------------------------------
-        // UPDATE POPULATE DROPDOWNS (DAPATKAN DAFTAR BULAN & TAHUN >= 2025)
-        // ---------------------------------------------------------------------
         function populateDropdownsAdditional(data) {
             const monthCheckboxList = document.getElementById('monthCheckboxList');
             const yearCheckboxList = document.getElementById('yearCheckboxList');
-            
             monthCheckboxList.innerHTML = '';
             yearCheckboxList.innerHTML = '';
             selectedMonths.clear();
@@ -975,51 +1034,39 @@
             data.forEach(row => {
                 const { month, year } = parseMonthYear(row['Start TT Open Time']);
                 if (month !== null) monthSet.add(month);
-                if (year !== null && year >= 2025) yearSet.add(year);
+                if (year !== null) yearSet.add(year);
             });
 
-            // Populate Checkbox Bulan (1-12)
             Array.from(monthSet).sort((a,b) => a - b).forEach(mIdx => {
                 selectedMonths.add(mIdx);
                 const div = document.createElement('div');
                 div.className = 'flex items-center gap-2 hover:bg-slate-50 p-1 rounded';
-                div.innerHTML = `
-                    <input type="checkbox" value="${mIdx}" class="month-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
-                    <span class="truncate">${MONTH_NAMES[mIdx]}</span>
-                `;
+                div.innerHTML = `<input type="checkbox" value="${mIdx}" class="month-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked><span class="truncate">${MONTH_NAMES[mIdx]}</span>`;
                 monthCheckboxList.appendChild(div);
             });
 
             document.querySelectorAll('.month-checkbox').forEach(cb => {
                 cb.addEventListener('change', (e) => {
                     const val = parseInt(e.target.value, 10);
-                    if (e.target.checked) selectedMonths.add(val);
-                    else selectedMonths.delete(val);
-                    updateMonthDropdownLabel();
-                    applyFilters();
+                    if (e.target.checked) selectedMonths.add(val); else selectedMonths.delete(val);
+                    updateMonthDropdownLabel(); triggerDebouncedFilters();
                 });
             });
             updateMonthDropdownLabel();
 
-            // Populate Checkbox Tahun (2025, 2026, dst.)
             Array.from(yearSet).sort((a,b) => a - b).forEach(yr => {
                 selectedYears.add(yr);
                 const div = document.createElement('div');
                 div.className = 'flex items-center gap-2 hover:bg-slate-50 p-1 rounded';
-                div.innerHTML = `
-                    <input type="checkbox" value="${yr}" class="year-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
-                    <span class="truncate">${yr}</span>
-                `;
+                div.innerHTML = `<input type="checkbox" value="${yr}" class="year-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked><span class="truncate">${yr}</span>`;
                 yearCheckboxList.appendChild(div);
             });
 
             document.querySelectorAll('.year-checkbox').forEach(cb => {
                 cb.addEventListener('change', (e) => {
                     const val = parseInt(e.target.value, 10);
-                    if (e.target.checked) selectedYears.add(val);
-                    else selectedYears.delete(val);
-                    updateYearDropdownLabel();
-                    applyFilters();
+                    if (e.target.checked) selectedYears.add(val); else selectedYears.delete(val);
+                    updateYearDropdownLabel(); triggerDebouncedFilters();
                 });
             });
             updateYearDropdownLabel();
@@ -1029,163 +1076,75 @@
             const totalCb = document.querySelectorAll('.month-checkbox').length;
             const selectedCount = selectedMonths.size;
             const label = document.getElementById('monthDropdownLabel');
-
-            if (selectedCount === totalCb || totalCb === 0) {
-                label.innerText = 'Semua Bulan';
-            } else if (selectedCount === 0) {
-                label.innerText = 'Tidak Ada Terpilih';
-            } else {
-                label.innerText = `${selectedCount} Bulan Terpilih`;
-            }
+            if (selectedCount === totalCb || totalCb === 0) label.innerText = 'Semua Bulan';
+            else if (selectedCount === 0) label.innerText = 'Tidak Ada Terpilih';
+            else label.innerText = `${selectedCount} Bulan Terpilih`;
         }
 
         function updateYearDropdownLabel() {
             const totalCb = document.querySelectorAll('.year-checkbox').length;
             const selectedCount = selectedYears.size;
             const label = document.getElementById('yearDropdownLabel');
-
-            if (selectedCount === totalCb || totalCb === 0) {
-                label.innerText = 'Semua Tahun';
-            } else if (selectedCount === 0) {
-                label.innerText = 'Tidak Ada Terpilih';
-            } else {
-                label.innerText = `${selectedCount} Tahun Terpilih`;
-            }
+            if (selectedCount === totalCb || totalCb === 0) label.innerText = 'Semua Tahun';
+            else if (selectedCount === 0) label.innerText = 'Tidak Ada Terpilih';
+            else label.innerText = `${selectedCount} Tahun Terpilih`;
         }
-      
-        let selectedRegionals = new Set();
-
-        let chartBestBranchInstance = null;
-        let chartWorstBranchInstance = null;
-        let chartTopPICInstance = null;
-        let chartCompletenessInstance = null;
-        let chartUnassignedBranchInstance = null;
-        let chartUnassignedStatusInstance = null;
-        let chartTimeOfDayInstance = null;
-        let chartTimePerformanceInstance = null;
-        let chartHourlyOpenTimeInstance = null;
-
-        // INSTANCE CHART
-        let chartWorstEngineerResponseInstance = null;
-        let chartWorstEngineerSkillInstance = null;
-        let chartWorstBranchTravelTimeInstance = null;
-
-        // SLA THRESHOLD CONSTANTS (IN MINUTES)
-        const THRESHOLD_STAGE1_MIN = 15;        // Create -> Prepare (15 Menit)
-        const THRESHOLD_STAGE2_MIN = 105;       // Prepare -> Tiba (1.45 Jam = 105 Menit)
-        const THRESHOLD_STAGE3_MIN = 120;       // Tiba -> Tech Close (2 Jam = 120 Menit)
-
-        document.getElementById('excelFileInput').addEventListener('change', handleFileUpload);
-        document.getElementById('dedupToggle').addEventListener('change', applyFilters);
-        document.getElementById('areaFilter').addEventListener('change', applyFilters);
-        document.getElementById('statusFilter').addEventListener('change', applyFilters);
-        document.getElementById('timeFilter').addEventListener('change', applyFilters);
-        document.getElementById('searchInput').addEventListener('input', applyFilters);
-        document.getElementById('branchSearchInput').addEventListener('input', applyFilters);
-        document.getElementById('milestoneSearchInput').addEventListener('input', applyFilters);
-        document.getElementById('alignmentSearchInput').addEventListener('input', applyFilters);
-        document.getElementById('timelyDetailSearchInput').addEventListener('input', applyFilters);
-        document.getElementById('searchUnassignedInput').addEventListener('input', applyFilters);
-        document.getElementById('dailyTrendSearchInput').addEventListener('input', applyFilters);
-
-        // LISTENERS INPUT SEARCH MODUL TEKNISI TERPISAH
-        document.getElementById('worstEngineerSearchInput').addEventListener('input', applyFilters);
-        document.getElementById('worstTravelSearchInput').addEventListener('input', applyFilters);
-
-        // DATE DROPDOWN TOGGLE LISTENERS
-        const dateDropdownBtn = document.getElementById('dateDropdownBtn');
-        const dateDropdownPanel = document.getElementById('dateDropdownPanel');
-
-        dateDropdownBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dateDropdownPanel.classList.toggle('hidden');
-            regDropdownPanel.classList.add('hidden');
-        });
-
-        document.getElementById('btnSelectAllDate').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.date-checkbox');
-            checkboxes.forEach(cb => { cb.checked = true; selectedDates.add(cb.value); });
-            updateDateDropdownLabel();
-            applyFilters();
-        });
-
-        document.getElementById('btnClearDate').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.date-checkbox');
-            checkboxes.forEach(cb => { cb.checked = false; });
-            selectedDates.clear();
-            updateDateDropdownLabel();
-            applyFilters();
-        });
-
-        // REGIONAL DROPDOWN TOGGLE LISTENERS
-        const regDropdownBtn = document.getElementById('regionalDropdownBtn');
-        const regDropdownPanel = document.getElementById('regionalDropdownPanel');
-
-        regDropdownBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            regDropdownPanel.classList.toggle('hidden');
-            dateDropdownPanel.classList.add('hidden');
-        });
-
-        document.getElementById('btnSelectAllRegional').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.reg-checkbox');
-            checkboxes.forEach(cb => { cb.checked = true; selectedRegionals.add(cb.value); });
-            updateRegionalDropdownLabel();
-            applyFilters();
-        });
-
-        document.getElementById('btnClearRegional').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.reg-checkbox');
-            checkboxes.forEach(cb => { cb.checked = false; });
-            selectedRegionals.clear();
-            updateRegionalDropdownLabel();
-            applyFilters();
-        });
 
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
 
+            const uploadLabelText = document.getElementById('uploadLabelText');
+            uploadLabelText.innerText = "Memuat file besar...";
+
             const reader = new FileReader();
             reader.onload = function(evt) {
-                try {
-                    const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    rawDataset = XLSX.utils.sheet_to_json(worksheet);
+                setTimeout(() => {
+                    try {
+                        const data = new Uint8Array(evt.target.result);
+                        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        rawDataset = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
-                    populateDropdowns(rawDataset);
-                    applyFilters();
-                } catch (err) {
-                    console.error("Gagal membaca file Excel:", err);
-                    alert("Gagal membaca file Excel.");
-                }
+                        uploadLabelText.innerText = `Upload File (${rawDataset.length} baris)`;
+                        populateDropdowns(rawDataset);
+                        applyFilters();
+                    } catch (err) {
+                        console.error("Gagal membaca file Excel:", err);
+                        uploadLabelText.innerText = "Upload File Excel (.xlsx)";
+                        alert("Gagal membaca file Excel.");
+                    }
+                }, 50);
             };
             reader.readAsArrayBuffer(file);
         }
 
+        function triggerDebouncedFilters() {
+            if (filterDebounceTimer) clearTimeout(filterDebounceTimer);
+            filterDebounceTimer = setTimeout(() => {
+                applyFilters();
+            }, 250);
+        }
+
         function deduplicateDataset(data) {
             const ticketMap = new Map();
-
-            data.forEach(row => {
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
                 const ticketId = String(row['Tiket'] || row['Nomor TT'] || '').trim();
-                if (!ticketId) return;
-
+                if (!ticketId) continue;
                 if (!ticketMap.has(ticketId)) {
                     ticketMap.set(ticketId, row);
                 } else {
                     const existingRow = ticketMap.get(ticketId);
                     const currStatus = String(row['Status'] || '').toLowerCase();
                     const existingStatus = String(existingRow['Status'] || '').toLowerCase();
-
                     if ((existingStatus.includes('cancel') || existingStatus.includes('dobel')) && 
                         (!currStatus.includes('cancel') && !currStatus.includes('dobel'))) {
                         ticketMap.set(ticketId, row);
                     }
                 }
-            });
-
+            }
             return Array.from(ticketMap.values());
         }
 
@@ -1200,43 +1159,25 @@
             return 'Tidak Ada PIC';
         }
 
-        // PARSING 3 STAGES DAN EVALUASI THRESHOLD SLA
         function parse3StageMilestones(timelyText) {
             if (!timelyText || typeof timelyText !== 'string') {
-                return {
-                    durations: { stage1Min: null, stage2Min: null, stage3Min: null },
-                    slaPass: { stage1: false, stage2: false, stage3: false }
-                };
+                return { durations: { stage1Min: null, stage2Min: null, stage3Min: null }, slaPass: { stage1: false, stage2: false, stage3: false } };
             }
-
             const lines = timelyText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            let timeMap = {
-                create: null,
-                prepare: null,
-                tiba: null,
-                lastActivity: null
-            };
+            let timeMap = { create: null, prepare: null, tiba: null, lastActivity: null };
 
-            lines.forEach(line => {
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
                 const match = line.match(/(\d{2}):(\d{2})\s*=\s*(.+)/);
                 if (match) {
-                    const hh = parseInt(match[1], 10);
-                    const mm = parseInt(match[2], 10);
-                    const totalMins = hh * 60 + mm;
+                    const totalMins = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
                     const actStr = match[3].toLowerCase();
-
-                    if (actStr.includes('dicreate') || actStr.includes('create')) {
-                        if (timeMap.create === null) timeMap.create = totalMins;
-                    }
-                    if (actStr.includes('prepare')) {
-                        if (timeMap.prepare === null) timeMap.prepare = totalMins;
-                    }
-                    if (actStr.includes('tiba')) {
-                        if (timeMap.tiba === null) timeMap.tiba = totalMins;
-                    }
+                    if (actStr.includes('dicreate') || actStr.includes('create')) { if (timeMap.create === null) timeMap.create = totalMins; }
+                    if (actStr.includes('prepare')) { if (timeMap.prepare === null) timeMap.prepare = totalMins; }
+                    if (actStr.includes('tiba')) { if (timeMap.tiba === null) timeMap.tiba = totalMins; }
                     timeMap.lastActivity = totalMins;
                 }
-            });
+            }
 
             function calcDiff(start, end) {
                 if (start === null || end === null) return null;
@@ -1249,21 +1190,9 @@
             const stage2Min = calcDiff(timeMap.prepare, timeMap.tiba);
             const stage3Min = calcDiff(timeMap.tiba, timeMap.lastActivity);
 
-            const passS1 = (stage1Min !== null) && (stage1Min <= THRESHOLD_STAGE1_MIN);
-            const passS2 = (stage2Min !== null) && (stage2Min <= THRESHOLD_STAGE2_MIN);
-            const passS3 = (stage3Min !== null) && (stage3Min <= THRESHOLD_STAGE3_MIN);
-
             return {
-                durations: {
-                    stage1Min: stage1Min,
-                    stage2Min: stage2Min,
-                    stage3Min: stage3Min
-                },
-                slaPass: {
-                    stage1: passS1,
-                    stage2: passS2,
-                    stage3: passS3
-                }
+                durations: { stage1Min, stage2Min, stage3Min },
+                slaPass: { stage1: stage1Min !== null && stage1Min <= THRESHOLD_STAGE1_MIN, stage2: stage2Min !== null && stage2Min <= THRESHOLD_STAGE2_MIN, stage3: stage3Min !== null && stage3Min <= THRESHOLD_STAGE3_MIN }
             };
         }
 
@@ -1292,35 +1221,26 @@
         }
 
         function parseStopClockFromTimely(timelyText) {
-            if (!timelyText || typeof timelyText !== 'string') {
-                return { hasSC: false, scCount: 0, reasons: [] };
-            }
-
+            if (!timelyText || typeof timelyText !== 'string') return { hasSC: false, scCount: 0, reasons: [] };
             const lines = timelyText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let scCount = 0;
             let reasons = [];
-
             const regexSCWithParen = /request\s+stop\s+clock[^(]*\(([^)]+)\)/gi;
 
-            lines.forEach(line => {
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
                 const matches = [...line.matchAll(regexSCWithParen)];
-
                 if (matches.length > 0) {
-                    matches.forEach(m => {
+                    for (let j = 0; j < matches.length; j++) {
                         scCount++;
-                        const reason = m[1].trim();
+                        const reason = matches[j][1].trim();
                         if (reason) reasons.push(reason);
-                    });
+                    }
                 } else if (/request\s+stop\s+clock/gi.test(line)) {
                     scCount++;
                 }
-            });
-
-            return {
-                hasSC: scCount > 0,
-                scCount: scCount,
-                reasons: reasons
-            };
+            }
+            return { hasSC: scCount > 0, scCount, reasons };
         }
 
         function applyFilters() {
@@ -1328,7 +1248,6 @@
 
             const isDedupActive = document.getElementById('dedupToggle').checked;
             const dedupStatusText = document.getElementById('dedupStatusText');
-
             let baseData = isDedupActive ? deduplicateDataset(rawDataset) : rawDataset;
 
             if (isDedupActive) {
@@ -1350,20 +1269,20 @@
             const timelySearch = document.getElementById('timelyDetailSearchInput').value.toLowerCase();
             const unassignedSearch = document.getElementById('searchUnassignedInput').value.toLowerCase();
             const dailySearch = document.getElementById('dailyTrendSearchInput').value.toLowerCase();
-
             const worstEngSearch = document.getElementById('worstEngineerSearchInput').value.toLowerCase();
             const worstTravelSearch = document.getElementById('worstTravelSearchInput').value.toLowerCase();
 
-            const filtered = baseData.filter(row => {
+            const filtered = [];
+            for (let i = 0; i < baseData.length; i++) {
+                const row = baseData[i];
                 const rowDate = formatDate(row['Start TT Open Time']);
                 const matchesDate = selectedDates.size === 0 || selectedDates.has(rowDate);
 
                 const { month, year } = parseMonthYear(row['Start TT Open Time']);
                 const matchesMonth = selectedMonths.size === 0 || (month !== null && selectedMonths.has(month));
-                const matchesYear = selectedYears.size === 0 || (year !== null && year >= 2025 && selectedYears.has(year));
+                const matchesYear = selectedYears.size === 0 || (year !== null && selectedYears.has(year));
 
                 const matchesArea = (selectedArea === 'ALL') || (String(row['Area']).trim() === selectedArea);
-                
                 const rowRegional = String(row['Regional MTEL'] || '').trim();
                 const matchesRegional = selectedRegionals.size === 0 || selectedRegionals.has(rowRegional);
 
@@ -1371,8 +1290,10 @@
                 const tod = parseTimeOfDay(row['Start TT Open Time']);
                 const matchesTime = (selectedTime === 'ALL') || (tod === selectedTime);
 
-                return matchesDate && matchesMonth && matchesYear && matchesArea && matchesRegional && matchesStatus && matchesTime;
-            });
+                if (matchesDate && matchesMonth && matchesYear && matchesArea && matchesRegional && matchesStatus && matchesTime) {
+                    filtered.push(row);
+                }
+            }
 
             processAndRender(filtered, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch, worstEngSearch, worstTravelSearch);
         }
@@ -1381,42 +1302,28 @@
             let datesSet = new Set();
             let scTechMap = {};
 
-            data.forEach(row => {
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
                 const timely = row['Timely Report'] || '';
                 const pic = extractPIC(timely);
                 const branch = String(row['BRANCH'] || 'Unknown').trim();
                 const ticketNo = String(row['Tiket'] || row['Nomor TT'] || row['Ticket Info'] || '-').trim();
                 const date = formatDate(row['Start TT Open Time']);
-
                 const scData = parseStopClockFromTimely(timely);
 
                 if (date !== 'Unknown Date') datesSet.add(date);
 
                 if (!scTechMap[pic]) {
-                    scTechMap[pic] = {
-                        name: pic,
-                        branch: branch,
-                        totalSCFreq: 0,
-                        scTicketsCount: 0,
-                        dates: {}
-                    };
+                    scTechMap[pic] = { name: pic, branch: branch, totalSCFreq: 0, scTicketsCount: 0, dates: {} };
                 }
 
                 if (scData.hasSC) {
                     scTechMap[pic].scTicketsCount += 1;
                     scTechMap[pic].totalSCFreq += scData.scCount;
-
-                    if (!scTechMap[pic].dates[date]) {
-                        scTechMap[pic].dates[date] = [];
-                    }
-
-                    scTechMap[pic].dates[date].push({
-                        ticket: ticketNo,
-                        freq: scData.scCount,
-                        reasons: scData.reasons
-                    });
+                    if (!scTechMap[pic].dates[date]) scTechMap[pic].dates[date] = [];
+                    scTechMap[pic].dates[date].push({ ticket: ticketNo, freq: scData.scCount, reasons: scData.reasons });
                 }
-            });
+            }
 
             const sortedDates = Array.from(datesSet).sort();
             let techList = Object.values(scTechMap);
@@ -1425,47 +1332,28 @@
                 techList = techList.filter(t => 
                     t.name.toLowerCase().includes(keyword) ||
                     t.branch.toLowerCase().includes(keyword) ||
-                    Object.values(t.dates).some(dayTickets => 
-                        dayTickets.some(d => d.ticket.toLowerCase().includes(keyword) || d.reasons.some(r => r.toLowerCase().includes(keyword)))
-                    )
+                    Object.values(t.dates).some(dayTickets => dayTickets.some(d => d.ticket.toLowerCase().includes(keyword) || d.reasons.some(r => r.toLowerCase().includes(keyword))))
                 );
             }
 
-            // 1. DIAGRAM BAR (RANKING TOP 10)
             let sortedForChart = [...techList].sort((a, b) => b.totalSCFreq - a.totalSCFreq || b.scTicketsCount - a.scTicketsCount);
             let top10SC = sortedForChart.slice(0, 10);
 
             if (chartStopClockRankingInstance) chartStopClockRankingInstance.destroy();
             const ctxChart = document.getElementById('chartStopClockRanking').getContext('2d');
-            
             chartStopClockRankingInstance = new Chart(ctxChart, {
                 type: 'bar',
                 data: {
                     labels: top10SC.map(t => t.name.split(' ')[0] + ' ' + (t.name.split(' ')[1] || '')),
                     datasets: [
-                        {
-                            label: 'Freq Req SC (Kali)',
-                            data: top10SC.map(t => t.totalSCFreq),
-                            backgroundColor: '#f59e0b',
-                            borderRadius: 6
-                        },
-                        {
-                            label: 'Tiket Terkena SC',
-                            data: top10SC.map(t => t.scTicketsCount),
-                            backgroundColor: '#ef4444',
-                            borderRadius: 6
-                        }
+                        { label: 'Freq Req SC (Kali)', data: top10SC.map(t => t.totalSCFreq), backgroundColor: '#f59e0b', borderRadius: 6 },
+                        { label: 'Tiket Terkena SC', data: top10SC.map(t => t.scTicketsCount), backgroundColor: '#ef4444', borderRadius: 6 }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            labels: { color: '#fef3c7', font: { size: 10, weight: 'bold' } }
-                        }
-                    },
+                    plugins: { legend: { display: true, labels: { color: '#fef3c7', font: { size: 10, weight: 'bold' } } } },
                     scales: {
                         x: { ticks: { color: '#fde68a', font: { size: 10, weight: 'bold' } } },
                         y: { ticks: { color: '#cbd5e1' }, beginAtZero: true }
@@ -1473,7 +1361,6 @@
                 }
             });
 
-            // 2. TABEL MATRIKS HARIAN
             const header = document.getElementById('stopClockMatrixHeader');
             let dateThsHTML = sortedDates.map(d => `<th class="py-2.5 px-3 border-r border-b border-slate-200 text-center min-w-[200px] bg-amber-100/60 text-amber-950 font-bold">${d}</th>`).join('');
 
@@ -1483,9 +1370,7 @@
                     <th rowspan="2" class="py-3 px-4 min-w-[200px] border-r border-b border-slate-200 bg-amber-100/80 text-amber-950 align-middle">Teknisi</th>
                     <th colspan="${sortedDates.length}" class="py-2 px-4 text-center border-b border-slate-200 bg-amber-200/70 text-amber-950 font-bold">Trend Harian Stop Clock</th>
                 </tr>
-                <tr>
-                    ${dateThsHTML}
-                </tr>
+                <tr>${dateThsHTML}</tr>
             `;
 
             const tbody = document.getElementById('stopClockTableBody');
@@ -1497,130 +1382,70 @@
             }
 
             techList.sort((a, b) => b.totalSCFreq - a.totalSCFreq || b.scTicketsCount - a.scTicketsCount);
-
-            techList.forEach((item, index) => {
+            const renderLimit = 100;
+            const displayTechList = techList.slice(0, renderLimit);
+            
+            let htmlFragment = '';
+            displayTechList.forEach((item, index) => {
                 let rowTdsHTML = sortedDates.map(d => {
                     const scEntries = item.dates[d];
                     if (scEntries && scEntries.length > 0) {
                         let badges = scEntries.map(e => {
                             let freqTag = `<span class="text-rose-600 font-bold">(${e.freq}x SC)</span>`;
                             let reasonsHTML = e.reasons.length > 0 ? `<div class="text-[10px] text-slate-500 font-normal leading-tight mt-0.5">${e.reasons.join(' | ')}</div>` : '';
-                            return `
-                                <div class="bg-amber-50 border border-amber-300 p-1.5 rounded-lg mb-1 text-left shadow-2xs">
-                                    <div class="font-mono font-bold text-amber-900 text-[11px] flex items-center justify-between">
-                                        <span>${e.ticket}</span>
-                                        ${freqTag}
-                                    </div>
-                                    ${reasonsHTML}
-                                </div>`;
+                            return `<div class="bg-amber-50 border border-amber-300 p-1.5 rounded-lg mb-1 text-left shadow-2xs"><div class="font-mono font-bold text-amber-900 text-[11px] flex items-center justify-between"><span>${e.ticket}</span>${freqTag}</div>${reasonsHTML}</div>`;
                         }).join('');
-
-                        return `
-                            <td class="p-2 border-r border-slate-200 align-top bg-amber-50/10">
-                                <div class="badge-container max-h-56 overflow-y-auto pr-1">
-                                    ${badges}
-                                </div>
-                            </td>`;
+                        return `<td class="p-2 border-r border-slate-200 align-top bg-amber-50/10"><div class="badge-container max-h-56 overflow-y-auto pr-1">${badges}</div></td>`;
                     }
                     return `<td class="py-3 px-3 border-r border-slate-200 text-center text-slate-300 font-mono align-middle">-</td>`;
                 }).join('');
 
                 let displayName = `<span class="font-bold text-slate-800">${item.name}</span><div class="text-[10px] text-slate-400">${item.branch}</div>`;
-                if (item.name === 'Tidak Ada PIC') {
-                    displayName = `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold text-[11px] inline-block">Tidak Ada PIC</span><div class="text-[10px] text-slate-400 mt-0.5">${item.branch}</div>`;
-                }
+                if (item.name === 'Tidak Ada PIC') displayName = `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold text-[11px] inline-block">Tidak Ada PIC</span><div class="text-[10px] text-slate-400 mt-0.5">${item.branch}</div>`;
 
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 border-b border-slate-200';
-                tr.innerHTML = `
-                    <td class="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-500 align-top">${index + 1}</td>
-                    <td class="py-3 px-4 border-r border-slate-200 align-top">${displayName}</td>
-                    ${rowTdsHTML}
-                `;
-                tbody.appendChild(tr);
+                htmlFragment += `<tr class="hover:bg-slate-50 border-b border-slate-200"><td class="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-500 align-top">${index + 1}</td><td class="py-3 px-4 border-r border-slate-200 align-top">${displayName}</td>${rowTdsHTML}</tr>`;
             });
+            tbody.innerHTML = htmlFragment;
         }
 
         function parseTimelyFullDetails(timelyText, openTimeFallback) {
-            if (!timelyText || typeof timelyText !== 'string') {
-                return {
-                    startTimeStr: openTimeFallback || '-',
-                    lastTimeStr: '-',
-                    lastActivity: '-',
-                    durationHours: 0
-                };
-            }
-
+            if (!timelyText || typeof timelyText !== 'string') return { startTimeStr: openTimeFallback || '-', lastTimeStr: '-', lastActivity: '-', durationHours: 0 };
             const lines = timelyText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let entries = [];
 
-            lines.forEach(line => {
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
                 const match = line.match(/(\d{2}\/\d{2}\/\d{4})?\s*(\d{2}):(\d{2})\s*=\s*(.+)/);
                 if (match) {
                     const dateStr = match[1] || '';
-                    const hhStr = match[2];
-                    const mmStr = match[3];
-                    const hh = parseInt(hhStr, 10);
-                    const mm = parseInt(mmStr, 10);
-                    const totalMins = hh * 60 + mm;
-                    const activity = match[4].trim();
-
-                    entries.push({
-                        dateStr: dateStr,
-                        timeFormatted: `${hhStr}:${mmStr}`,
-                        totalMins: totalMins,
-                        activity: activity,
-                        fullStr: (dateStr ? dateStr + ' ' : '') + `${hhStr}:${mmStr} (${activity})`
-                    });
+                    const hh = parseInt(match[2], 10);
+                    const mm = parseInt(match[3], 10);
+                    entries.push({ dateStr, timeFormatted: `${match[2]}:${match[3]}`, totalMins: hh * 60 + mm, activity: match[4].trim(), fullStr: (dateStr ? dateStr + ' ' : '') + `${match[2]}:${match[3]} (${match[4].trim()})` });
                 }
-            });
+            }
 
             if (entries.length >= 1) {
                 const first = entries[0];
                 const last = entries[entries.length - 1];
-
                 let startMins = first.totalMins;
                 let lastMins = last.totalMins;
-                if (lastMins < startMins) {
-                    lastMins += 24 * 60;
-                }
-
-                let diffHours = (entries.length > 1) ? ((lastMins - startMins) / 60.0) : 0;
-
-                return {
-                    startTimeStr: first.fullStr,
-                    lastTimeStr: last.fullStr,
-                    lastActivity: last.activity,
-                    durationHours: diffHours
-                };
+                if (lastMins < startMins) lastMins += 24 * 60;
+                let diffHours = entries.length > 1 ? ((lastMins - startMins) / 60.0) : 0;
+                return { startTimeStr: first.fullStr, lastTimeStr: last.fullStr, lastActivity: last.activity, durationHours: diffHours };
             }
-
-            return {
-                startTimeStr: openTimeFallback || '-',
-                lastTimeStr: '-',
-                lastActivity: '-',
-                durationHours: 0
-            };
+            return { startTimeStr: openTimeFallback || '-', lastTimeStr: '-', lastActivity: '-', durationHours: 0 };
         }
 
         function extractHour(openTimeString) {
             if (!openTimeString) return -1;
-            let str = String(openTimeString);
-            let match = str.match(/(\d{1,2}):\d{2}/);
-            if (match) {
-                return parseInt(match[1], 10);
-            }
-            return -1;
+            let match = String(openTimeString).match(/(\d{1,2}):\d{2}/);
+            return match ? parseInt(match[1], 10) : -1;
         }
 
         function parseTimeOfDay(openTimeString) {
             let hour = extractHour(openTimeString);
             if (hour === -1) return 'Unknown';
-
-            if (hour >= 6 && hour < 18) {
-                return 'Shift-1';
-            }
-            return 'Shift-2';
+            return (hour >= 6 && hour < 18) ? 'Shift-1' : 'Shift-2';
         }
 
         function populateDropdowns(data) {
@@ -1632,21 +1457,19 @@
             const areaSelect = document.getElementById('areaFilter');
             areaSelect.innerHTML = '<option value="ALL">Semua Area</option>';
             const areaSet = new Set();
-
             const regSet = new Set();
-
             const statusSelect = document.getElementById('statusFilter');
             statusSelect.innerHTML = '<option value="ALL">Semua Status (All)</option>';
             const statusSet = new Set();
 
-            data.forEach(row => {
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
                 const d = formatDate(row['Start TT Open Time']);
                 if (d !== 'Unknown Date') dateSet.add(d);
-
-                if (row['Area'] !== undefined && row['Area'] !== null) areaSet.add(String(row['Area']).trim());
+                if (row['Area'] != null) areaSet.add(String(row['Area']).trim());
                 if (row['Regional MTEL']) regSet.add(String(row['Regional MTEL']).trim());
                 if (row['Status']) statusSet.add(String(row['Status']).trim());
-            });
+            }
 
             populateDropdownsAdditional(data);
 
@@ -1654,39 +1477,27 @@
                 selectedDates.add(dt);
                 const div = document.createElement('div');
                 div.className = 'flex items-center gap-2 hover:bg-slate-50 p-1 rounded';
-                div.innerHTML = `
-                    <input type="checkbox" value="${dt}" class="date-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
-                    <span class="truncate">${dt}</span>
-                `;
+                div.innerHTML = `<input type="checkbox" value="${dt}" class="date-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked><span class="truncate">${dt}</span>`;
                 dateCheckboxList.appendChild(div);
             });
 
             document.querySelectorAll('.date-checkbox').forEach(cb => {
                 cb.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        selectedDates.add(e.target.value);
-                    } else {
-                        selectedDates.delete(e.target.value);
-                    }
-                    updateDateDropdownLabel();
-                    applyFilters();
+                    if (e.target.checked) selectedDates.add(e.target.value); else selectedDates.delete(e.target.value);
+                    updateDateDropdownLabel(); triggerDebouncedFilters();
                 });
             });
             updateDateDropdownLabel();
 
             Array.from(areaSet).sort().forEach(ar => {
                 const opt = document.createElement('option');
-                opt.value = ar;
-                opt.textContent = 'Area ' + ar;
-                areaSelect.appendChild(opt);
+                opt.value = ar; opt.textContent = 'Area ' + ar; areaSelect.appendChild(opt);
             });
 
             Array.from(statusSet).sort().forEach(st => {
                 if (st && st !== 'undefined') {
                     const opt = document.createElement('option');
-                    opt.value = st;
-                    opt.textContent = st;
-                    statusSelect.appendChild(opt);
+                    opt.value = st; opt.textContent = st; statusSelect.appendChild(opt);
                 }
             });
 
@@ -1698,25 +1509,16 @@
                 selectedRegionals.add(reg);
                 const div = document.createElement('div');
                 div.className = 'flex items-center gap-2 hover:bg-slate-50 p-1 rounded';
-                div.innerHTML = `
-                    <input type="checkbox" value="${reg}" class="reg-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
-                    <span class="truncate">${reg}</span>
-                `;
+                div.innerHTML = `<input type="checkbox" value="${reg}" class="reg-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked><span class="truncate">${reg}</span>`;
                 regCheckboxList.appendChild(div);
             });
 
             document.querySelectorAll('.reg-checkbox').forEach(cb => {
                 cb.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        selectedRegionals.add(e.target.value);
-                    } else {
-                        selectedRegionals.delete(e.target.value);
-                    }
-                    updateRegionalDropdownLabel();
-                    applyFilters();
+                    if (e.target.checked) selectedRegionals.add(e.target.value); else selectedRegionals.delete(e.target.value);
+                    updateRegionalDropdownLabel(); triggerDebouncedFilters();
                 });
             });
-
             updateRegionalDropdownLabel();
         }
 
@@ -1724,31 +1526,22 @@
             const totalCb = document.querySelectorAll('.date-checkbox').length;
             const selectedCount = selectedDates.size;
             const label = document.getElementById('dateDropdownLabel');
-
-            if (selectedCount === totalCb || totalCb === 0) {
-                label.innerText = 'Semua Tanggal';
-            } else if (selectedCount === 0) {
-                label.innerText = 'Tidak Ada Terpilih';
-            } else {
-                label.innerText = `${selectedCount} Tanggal Terpilih`;
-            }
+            if (selectedCount === totalCb || totalCb === 0) label.innerText = 'Semua Tanggal';
+            else if (selectedCount === 0) label.innerText = 'Tidak Ada Terpilih';
+            else label.innerText = `${selectedCount} Tanggal Terpilih`;
         }
 
         function updateRegionalDropdownLabel() {
             const totalCb = document.querySelectorAll('.reg-checkbox').length;
             const selectedCount = selectedRegionals.size;
             const label = document.getElementById('regionalDropdownLabel');
-
-            if (selectedCount === totalCb || totalCb === 0) {
-                label.innerText = 'Semua Regional';
-            } else if (selectedCount === 0) {
-                label.innerText = 'Tidak Ada Terpilih';
-            } else {
-                label.innerText = `${selectedCount} Regional Terpilih`;
-            }
+            if (selectedCount === totalCb || totalCb === 0) label.innerText = 'Semua Regional';
+            else if (selectedCount === 0) label.innerText = 'Tidak Ada Terpilih';
+            else label.innerText = `${selectedCount} Regional Terpilih`;
         }
 
         function processAndRender(data, searchKeyword, branchSearch, milestoneSearch, alignmentSearch, timelySearch, unassignedSearch, dailySearch, worstEngSearch, worstTravelSearch) {
+            lastFilteredDataForChart = data;
             let totalTickets = data.length;
             let branches = new Set();
             let picMap = {};
@@ -1765,20 +1558,13 @@
             let unassignedList = [];
 
             let timeOfDayMap = { 'Shift-1': 0, 'Shift-2': 0 };
-            let timePerfMap = {
-                'Shift-1': { total: 0, ttrTimely: 0, travel: 0 },
-                'Shift-2': { total: 0, ttrTimely: 0, travel: 0 }
-            };
+            let timePerfMap = { 'Shift-1': { total: 0, ttrTimely: 0, travel: 0 }, 'Shift-2': { total: 0, ttrTimely: 0, travel: 0 } };
 
-            let nationalSLAStats = {
-                s1Total: 0, s1Pass: 0,
-                s2Total: 0, s2Pass: 0,
-                s3Total: 0, s3Pass: 0
-            };
-
+            let nationalSLAStats = { s1Total: 0, s1Pass: 0, s2Total: 0, s2Pass: 0, s3Total: 0, s3Pass: 0 };
             let milestoneTechMap = {};
 
-            data.forEach(row => {
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
                 const area = String(row['Area'] || 'Unknown').trim();
                 const regional = String(row['Regional MTEL'] || 'Unknown').trim();
                 const branch = String(row['BRANCH'] || 'Unknown').trim();
@@ -1797,9 +1583,7 @@
                 const timelyDetails = parseTimelyFullDetails(timely, openTime);
 
                 const hr = extractHour(openTime);
-                if (hr >= 0 && hr < 24) {
-                    hourlyMap[hr] += 1;
-                }
+                if (hr >= 0 && hr < 24) hourlyMap[hr] += 1;
 
                 const tod = parseTimeOfDay(openTime);
                 const travel = parseFloat(row['Travel Time (Jam)']) || 0;
@@ -1812,57 +1596,22 @@
                 totalTravel += travel;
 
                 if (!branchSummaryMap[branch]) {
-                    branchSummaryMap[branch] = {
-                        branch: branch,
-                        area: area,
-                        regional: regional,
-                        tickets: 0,
-                        techs: new Set(),
-                        s1Total: 0, s1Pass: 0,
-                        s2Total: 0, s2Pass: 0,
-                        s3Total: 0, s3Pass: 0,
-                        totalTravelHours: 0,
-                        totalTTRHours: 0
-                    };
+                    branchSummaryMap[branch] = { branch, area, regional, tickets: 0, techs: new Set(), s1Total: 0, s1Pass: 0, s2Total: 0, s2Pass: 0, s3Total: 0, s3Pass: 0, totalTravelHours: 0, totalTTRHours: 0 };
                 }
                 branchSummaryMap[branch].tickets += 1;
                 branchSummaryMap[branch].totalTravelHours += travel;
                 branchSummaryMap[branch].totalTTRHours += ttr;
                 if (pic !== 'Tidak Ada PIC') branchSummaryMap[branch].techs.add(pic);
 
-                if (msDurations.stage1Min !== null) {
-                    branchSummaryMap[branch].s1Total++;
-                    if (msPass.stage1) branchSummaryMap[branch].s1Pass++;
-                }
-                if (msDurations.stage2Min !== null) {
-                    branchSummaryMap[branch].s2Total++;
-                    if (msPass.stage2) branchSummaryMap[branch].s2Pass++;
-                }
-                if (msDurations.stage3Min !== null) {
-                    branchSummaryMap[branch].s3Total++;
-                    if (msPass.stage3) branchSummaryMap[branch].s3Pass++;
-                }
+                if (msDurations.stage1Min !== null) { branchSummaryMap[branch].s1Total++; if (msPass.stage1) branchSummaryMap[branch].s1Pass++; }
+                if (msDurations.stage2Min !== null) { branchSummaryMap[branch].s2Total++; if (msPass.stage2) branchSummaryMap[branch].s2Pass++; }
+                if (msDurations.stage3Min !== null) { branchSummaryMap[branch].s3Total++; if (msPass.stage3) branchSummaryMap[branch].s3Pass++; }
 
-                if (msDurations.stage1Min !== null) {
-                    nationalSLAStats.s1Total++;
-                    if (msPass.stage1) nationalSLAStats.s1Pass++;
-                }
-                if (msDurations.stage2Min !== null) {
-                    nationalSLAStats.s2Total++;
-                    if (msPass.stage2) nationalSLAStats.s2Pass++;
-                }
-                if (msDurations.stage3Min !== null) {
-                    nationalSLAStats.s3Total++;
-                    if (msPass.stage3) nationalSLAStats.s3Pass++;
-                }
+                if (msDurations.stage1Min !== null) { nationalSLAStats.s1Total++; if (msPass.stage1) nationalSLAStats.s1Pass++; }
+                if (msDurations.stage2Min !== null) { nationalSLAStats.s2Total++; if (msPass.stage2) nationalSLAStats.s2Pass++; }
+                if (msDurations.stage3Min !== null) { nationalSLAStats.s3Total++; if (msPass.stage3) nationalSLAStats.s3Pass++; }
 
-                timelyDetailList.push({
-                    pic: pic,
-                    ticket: String(ticketNo),
-                    startTime: timelyDetails.startTimeStr,
-                    lastTime: timelyDetails.lastTimeStr,
-                    duration: timelyDetails.durationHours.toFixed(2)
-                });
+                timelyDetailList.push({ pic, ticket: String(ticketNo), startTime: timelyDetails.startTimeStr, lastTime: timelyDetails.lastTimeStr, duration: timelyDetails.durationHours.toFixed(2) });
 
                 if (timeOfDayMap[tod] !== undefined) {
                     timeOfDayMap[tod] += 1;
@@ -1873,82 +1622,38 @@
 
                 const alignKey = `${area}|${regional}|${branch}`;
                 if (!alignmentGroup[alignKey]) {
-                    alignmentGroup[alignKey] = {
-                        area: area,
-                        regional: regional,
-                        branch: branch,
-                        tickets: 0,
-                        pics: new Set(),
-                        hasUnassigned: false
-                    };
+                    alignmentGroup[alignKey] = { area, regional, branch, tickets: 0, pics: new Set(), hasUnassigned: false };
                 }
                 alignmentGroup[alignKey].tickets += 1;
 
                 if (pic !== 'Tidak Ada PIC') {
                     alignmentGroup[alignKey].pics.add(pic);
-
                     if (!milestoneTechMap[pic]) {
-                        milestoneTechMap[pic] = {
-                            name: pic,
-                            branch: branch,
-                            tickets: 0,
-                            totalResponseHours: 0,
-                            s1Total: 0, s1Pass: 0, s1Mins: [],
-                            s2Total: 0, s2Pass: 0, s2Mins: [],
-                            s3Total: 0, s3Pass: 0, s3Mins: []
-                        };
+                        milestoneTechMap[pic] = { name: pic, branch, tickets: 0, totalResponseHours: 0, s1Total: 0, s1Pass: 0, s1Mins: [], s2Total: 0, s2Pass: 0, s2Mins: [], s3Total: 0, s3Pass: 0, s3Mins: [] };
                     }
                     milestoneTechMap[pic].tickets += 1;
                     milestoneTechMap[pic].totalResponseHours += resp;
 
-                    if (msDurations.stage1Min !== null) {
-                        milestoneTechMap[pic].s1Total++;
-                        if (msPass.stage1) milestoneTechMap[pic].s1Pass++;
-                        milestoneTechMap[pic].s1Mins.push(msDurations.stage1Min);
-                    }
-                    if (msDurations.stage2Min !== null) {
-                        milestoneTechMap[pic].s2Total++;
-                        if (msPass.stage2) milestoneTechMap[pic].s2Pass++;
-                        milestoneTechMap[pic].s2Mins.push(msDurations.stage2Min);
-                    }
-                    if (msDurations.stage3Min !== null) {
-                        milestoneTechMap[pic].s3Total++;
-                        if (msPass.stage3) milestoneTechMap[pic].s3Pass++;
-                        milestoneTechMap[pic].s3Mins.push(msDurations.stage3Min);
-                    }
-
+                    if (msDurations.stage1Min !== null) { milestoneTechMap[pic].s1Total++; if (msPass.stage1) milestoneTechMap[pic].s1Pass++; milestoneTechMap[pic].s1Mins.push(msDurations.stage1Min); }
+                    if (msDurations.stage2Min !== null) { milestoneTechMap[pic].s2Total++; if (msPass.stage2) milestoneTechMap[pic].s2Pass++; milestoneTechMap[pic].s2Mins.push(msDurations.stage2Min); }
+                    if (msDurations.stage3Min !== null) { milestoneTechMap[pic].s3Total++; if (msPass.stage3) milestoneTechMap[pic].s3Pass++; milestoneTechMap[pic].s3Mins.push(msDurations.stage3Min); }
                 } else {
                     alignmentGroup[alignKey].hasUnassigned = true;
                     unassignedCount++;
                     unassignedBranchMap[branch] = (unassignedBranchMap[branch] || 0) + 1;
                     unassignedStatusMap[status] = (unassignedStatusMap[status] || 0) + 1;
-
-                    unassignedList.push({
-                        ticket: String(ticketNo),
-                        tt: String(nomorTT),
-                        branch: branch,
-                        ttr: ttr.toFixed(2),
-                        status: status
-                    });
+                    unassignedList.push({ ticket: String(ticketNo), tt: String(nomorTT), branch, ttr: ttr.toFixed(2), status });
                 }
 
                 if (!picMap[pic]) {
-                    picMap[pic] = {
-                        name: pic,
-                        branch: branch,
-                        tickets: 0,
-                        lengkap: 0,
-                        totalResp: 0,
-                        totalTimelyTTR: 0
-                    };
+                    picMap[pic] = { name: pic, branch, tickets: 0, lengkap: 0, totalResp: 0, totalTimelyTTR: 0 };
                 }
                 picMap[pic].tickets += 1;
                 if (comp === 'Lengkap') picMap[pic].lengkap += 1;
                 picMap[pic].totalResp += resp;
                 picMap[pic].totalTimelyTTR += timelyDetails.durationHours;
-            });
+            }
 
-            // Update KPI Cards
             document.getElementById('kpiTotalTickets').innerText = totalTickets;
             document.getElementById('kpiBranchCount').innerText = branches.size + ' Branch Terdeteksi';
             document.getElementById('kpiTotalPIC').innerText = Object.keys(picMap).filter(k => k !== 'Tidak Ada PIC').length;
@@ -1965,6 +1670,9 @@
             document.getElementById('kpiAvgTimelyTTR').innerText = avgTimelyTTR + ' Jam';
             document.getElementById('kpiAvgTravel').innerText = 'Travel Time: ' + avgTravel + ' Jam';
 
+            renderTeknisiVsTiketChart(data);
+            renderRegionalVsTeknisiTiketChart(data);
+
             renderStopClockModule(data, document.getElementById('stopClockSearchInput').value.toLowerCase());
             renderSeparatedWorstEngineerModules(milestoneTechMap, worstEngSearch);
             renderWorstTravelBranchModule(branchSummaryMap, totalTickets, totalTravel, worstTravelSearch);
@@ -1980,54 +1688,330 @@
             renderAlignmentTable(alignmentGroup, alignmentSearch);
             renderMainCharts(picMap, completenessCount);
             renderTable(picMap, searchKeyword);
+            
+            const uploadLabelText = document.getElementById('uploadLabelText');
+            if (rawDataset.length > 0) {
+                uploadLabelText.innerText = `Upload File (${rawDataset.length} baris)`;
+            }
+        }
+
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+            return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+        }
+
+        function renderTeknisiVsTiketChart(data) {
+            let stats = {};
+
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                const rawDateStr = row['Start TT Open Time'];
+                if (!rawDateStr) continue;
+
+                let dateObj = null;
+                let match = String(rawDateStr).match(/(\d{4})-(\d{2})-(\d{2})|(\d{2})\/(\d{2})\/(\d{4})/);
+                if (match) {
+                    if (match[1]) {
+                        dateObj = new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
+                    } else if (match[6]) {
+                        dateObj = new Date(parseInt(match[6]), parseInt(match[5]) - 1, parseInt(match[4]));
+                    }
+                }
+                if (!dateObj || isNaN(dateObj)) continue;
+
+                let key = '';
+                if (currentTeknisiVsTiketView === 'daily') {
+                    let dd = String(dateObj.getDate()).padStart(2, '0');
+                    let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    let yyyy = dateObj.getFullYear();
+                    key = `${dd}/${mm}/${yyyy}`;
+                } else if (currentTeknisiVsTiketView === 'weekly') {
+                    key = getWeekNumber(dateObj);
+                } else if (currentTeknisiVsTiketView === 'monthly') {
+                    let mm = MONTH_NAMES[dateObj.getMonth()];
+                    let yyyy = dateObj.getFullYear();
+                    key = `${mm} ${yyyy}`;
+                }
+
+                const timely = row['Timely Report'] || '';
+                const pic = extractPIC(timely);
+
+                if (!stats[key]) {
+                    stats[key] = { tickets: 0, techs: new Set(), sortKey: dateObj.getTime() };
+                }
+
+                stats[key].tickets += 1;
+                if (pic !== 'Tidak Ada PIC') {
+                    stats[key].techs.add(pic);
+                }
+            }
+
+            let sortedKeys = Object.keys(stats).sort((a, b) => stats[a].sortKey - stats[b].sortKey);
+
+            if (sortedKeys.length > 60) {
+                let sampledKeys = [];
+                let step = Math.ceil(sortedKeys.length / 50);
+                for (let i = 0; i < sortedKeys.length; i += step) {
+                    sampledKeys.push(sortedKeys[i]);
+                }
+                sortedKeys = sampledKeys;
+            }
+
+            const labels = sortedKeys;
+            const techData = sortedKeys.map(k => stats[k] ? stats[k].techs.size : 0);
+            const ticketData = sortedKeys.map(k => stats[k] ? stats[k].tickets : 0);
+
+            if (chartTeknisiVsTiketInstance) chartTeknisiVsTiketInstance.destroy();
+            const ctx = document.getElementById('chartTeknisiVsTiket').getContext('2d');
+            
+            let gradientBlue = ctx.createLinearGradient(0, 0, 0, 350);
+            gradientBlue.addColorStop(0, 'rgba(59, 130, 246, 0.95)');
+            gradientBlue.addColorStop(1, 'rgba(30, 64, 175, 0.85)');
+
+            let gradientOrange = ctx.createLinearGradient(0, 0, 0, 350);
+            gradientOrange.addColorStop(0, 'rgba(249, 115, 22, 0.95)');
+            gradientOrange.addColorStop(1, 'rgba(194, 65, 12, 0.85)');
+
+            chartTeknisiVsTiketInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '👨‍🔧 Jumlah Teknisi',
+                            data: techData,
+                            backgroundColor: gradientBlue,
+                            borderColor: '#1e40af',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            barPercentage: 0.65,
+                            categoryPercentage: 0.6,
+                            hoverBackgroundColor: 'rgba(59, 130, 246, 1)',
+                            hoverBorderColor: '#ffffff',
+                            hoverBorderWidth: 2
+                        },
+                        {
+                            label: '🎫 Jumlah Tiket',
+                            data: ticketData,
+                            backgroundColor: gradientOrange,
+                            borderColor: '#c2410c',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            barPercentage: 0.65,
+                            categoryPercentage: 0.6,
+                            hoverBackgroundColor: 'rgba(249, 115, 22, 1)',
+                            hoverBorderColor: '#ffffff',
+                            hoverBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 8,
+                                padding: 15,
+                                font: { family: "'Inter', sans-serif", size: 11, weight: 'bold' },
+                                color: '#475569'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleFont: { size: 13, family: "'Inter', sans-serif", weight: 'bold' },
+                            bodyFont: { size: 12, family: "'Inter', sans-serif", weight: '500' },
+                            padding: 12,
+                            cornerRadius: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { font: { family: "'Inter', sans-serif", size: 10, weight: '600' }, color: '#64748b', maxRotation: 45, minRotation: 0 }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e2e8f0', borderDash: [5, 5], drawBorder: false },
+                            ticks: { font: { family: "'Inter', sans-serif", size: 11, weight: '500' }, color: '#64748b', padding: 10 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRegionalVsTeknisiTiketChart(data) {
+            let statsMap = {};
+
+            if (currentRegionalDrilldownView === 'regional') {
+                for (let i = 0; i < data.length; i++) {
+                    const row = data[i];
+                    const regional = String(row['Regional MTEL'] || 'Lainnya').trim();
+                    const timely = row['Timely Report'] || '';
+                    const pic = extractPIC(timely);
+
+                    if (!statsMap[regional]) {
+                        statsMap[regional] = { tickets: 0, techs: new Set() };
+                    }
+
+                    statsMap[regional].tickets += 1;
+                    if (pic !== 'Tidak Ada PIC') {
+                        statsMap[regional].techs.add(pic);
+                    }
+                }
+            } else {
+                // Branch drilldown: if specific regional filters are chosen, or all branches
+                for (let i = 0; i < data.length; i++) {
+                    const row = data[i];
+                    const branch = String(row['BRANCH'] || 'Lainnya').trim();
+                    const timely = row['Timely Report'] || '';
+                    const pic = extractPIC(timely);
+
+                    if (!statsMap[branch]) {
+                        statsMap[branch] = { tickets: 0, techs: new Set() };
+                    }
+
+                    statsMap[branch].tickets += 1;
+                    if (pic !== 'Tidak Ada PIC') {
+                        statsMap[branch].techs.add(pic);
+                    }
+                }
+            }
+
+            let sortedKeys = Object.keys(statsMap).sort((a, b) => statsMap[b].tickets - statsMap[a].tickets);
+
+            // Limit branch display if too many to keep chart clean and readable
+            if (currentRegionalDrilldownView === 'branch' && sortedKeys.length > 15) {
+                sortedKeys = sortedKeys.slice(0, 15);
+            }
+
+            const labels = sortedKeys;
+            const techData = sortedKeys.map(k => statsMap[k] ? statsMap[k].techs.size : 0);
+            const ticketData = sortedKeys.map(k => statsMap[k] ? statsMap[k].tickets : 0);
+
+            if (chartRegionalVsTeknisiTiketInstance) chartRegionalVsTeknisiTiketInstance.destroy();
+            const ctx = document.getElementById('chartRegionalVsTeknisiTiket').getContext('2d');
+
+            let gradientBlue = ctx.createLinearGradient(0, 0, 0, 350);
+            gradientBlue.addColorStop(0, 'rgba(14, 116, 144, 0.95)');
+            gradientBlue.addColorStop(1, 'rgba(8, 51, 68, 0.85)');
+
+            let gradientOrange = ctx.createLinearGradient(0, 0, 0, 350);
+            gradientOrange.addColorStop(0, 'rgba(249, 115, 22, 0.95)');
+            gradientOrange.addColorStop(1, 'rgba(194, 65, 12, 0.85)');
+
+            chartRegionalVsTeknisiTiketInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Jumlah Teknisi',
+                            data: techData,
+                            backgroundColor: gradientBlue,
+                            borderColor: '#0e7490',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            barPercentage: 0.65,
+                            categoryPercentage: 0.6,
+                            hoverBackgroundColor: 'rgba(14, 116, 144, 1)',
+                            hoverBorderColor: '#ffffff',
+                            hoverBorderWidth: 2
+                        },
+                        {
+                            label: 'Jumlah Tiket',
+                            data: ticketData,
+                            backgroundColor: gradientOrange,
+                            borderColor: '#c2410c',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            barPercentage: 0.65,
+                            categoryPercentage: 0.6,
+                            hoverBackgroundColor: 'rgba(249, 115, 22, 1)',
+                            hoverBorderColor: '#ffffff',
+                            hoverBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 8,
+                                padding: 15,
+                                font: { family: "'Inter', sans-serif", size: 11, weight: 'bold' },
+                                color: '#475569'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleFont: { size: 13, family: "'Inter', sans-serif", weight: 'bold' },
+                            bodyFont: { size: 12, family: "'Inter', sans-serif", weight: '500' },
+                            padding: 12,
+                            cornerRadius: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { font: { family: "'Inter', sans-serif", size: 10, weight: '600' }, color: '#64748b', maxRotation: 45, minRotation: 0 }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e2e8f0', borderDash: [5, 5], drawBorder: false },
+                            ticks: { font: { family: "'Inter', sans-serif", size: 11, weight: '500' }, color: '#64748b', padding: 10 }
+                        }
+                    }
+                }
+            });
         }
 
         function renderSeparatedWorstEngineerModules(techMap, keyword) {
             const rawList = Object.values(techMap);
-
-            let responseList = rawList.map(t => {
-                const avgResp = t.tickets > 0 ? (t.totalResponseHours / t.tickets) : 0;
-                return {
-                    name: t.name,
-                    branch: t.branch,
-                    tickets: t.tickets,
-                    avgResponse: avgResp
-                };
-            });
-
+            let responseList = rawList.map(t => ({ name: t.name, branch: t.branch, tickets: t.tickets, avgResponse: t.tickets > 0 ? (t.totalResponseHours / t.tickets) : 0 }));
             responseList.sort((a, b) => b.avgResponse - a.avgResponse);
             const top10WorstResponse = responseList.slice(0, 10);
 
             let skillList = rawList.map(t => {
-                function getAvg(arr) { return arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0; }
-                const avgStage3Min = getAvg(t.s3Mins);
+                const avgStage3Min = t.s3Mins.length > 0 ? t.s3Mins.reduce((a, b) => a + b, 0) / t.s3Mins.length : 0;
                 const skillIndex = t.s3Total > 0 ? ((t.s3Pass / t.s3Total) * 100) : 0;
-                const s3Fail = t.s3Total - t.s3Pass;
-
-                return {
-                    name: t.name,
-                    branch: t.branch,
-                    tickets: t.tickets,
-                    s3Total: t.s3Total,
-                    s3Pass: t.s3Pass,
-                    s3Fail: s3Fail,
-                    avgStage3Min: avgStage3Min,
-                    skillIndex: skillIndex
-                };
+                return { name: t.name, branch: t.branch, tickets: t.tickets, s3Total: t.s3Total, s3Pass: t.s3Pass, s3Fail: t.s3Total - t.s3Pass, avgStage3Min, skillIndex };
             }).filter(t => t.s3Total > 0);
 
             skillList.sort((a, b) => b.s3Fail - a.s3Fail || a.skillIndex - b.skillIndex);
-
             const totalStage3Failures = skillList.reduce((sum, item) => sum + item.s3Fail, 0);
 
             let cumSum = 0;
             const top10ParetoSkill = skillList.slice(0, 10).map(t => {
                 cumSum += t.s3Fail;
-                const cumPct = totalStage3Failures > 0 ? (cumSum / totalStage3Failures) * 100 : 0;
-                return {
-                    ...t,
-                    cumPct: cumPct
-                };
+                return { ...t, cumPct: totalStage3Failures > 0 ? (cumSum / totalStage3Failures) * 100 : 0 };
             });
 
             if (chartWorstEngineerResponseInstance) chartWorstEngineerResponseInstance.destroy();
@@ -2036,58 +2020,31 @@
                 type: 'bar',
                 data: {
                     labels: top10WorstResponse.map(t => t.name.split(' ')[0] + ' ' + (t.name.split(' ')[1] || '')),
-                    datasets: [{
-                        label: 'Avg Response Time (Jam)',
-                        data: top10WorstResponse.map(t => parseFloat(t.avgResponse.toFixed(2))),
-                        backgroundColor: '#f43f5e',
-                        borderRadius: 6
-                    }]
+                    datasets: [{ label: 'Avg Response Time (Jam)', data: top10WorstResponse.map(t => parseFloat(t.avgResponse.toFixed(2))), backgroundColor: '#f43f5e', borderRadius: 6 }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false, animation: false,
                     plugins: { legend: { display: false } },
-                    scales: {
-                        x: { ticks: { color: '#fda4af', font: { size: 10, weight: 'bold' } } },
-                        y: { ticks: { color: '#cbd5e1' } }
-                    }
+                    scales: { x: { ticks: { color: '#fda4af', font: { size: 10, weight: 'bold' } } }, y: { ticks: { color: '#cbd5e1' } } }
                 }
             });
 
             const tbodyResp = document.getElementById('worstEngineerResponseTableBody');
             tbodyResp.innerHTML = '';
-
-            let filteredResp = responseList;
-            if (keyword) {
-                filteredResp = responseList.filter(t => 
-                    t.name.toLowerCase().includes(keyword) || 
-                    t.branch.toLowerCase().includes(keyword)
-                );
-            }
+            let filteredResp = keyword ? responseList.filter(t => t.name.toLowerCase().includes(keyword) || t.branch.toLowerCase().includes(keyword)) : responseList;
 
             if (filteredResp.length === 0) {
                 tbodyResp.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">Tidak ada data teknisi yang sesuai pencarian.</td></tr>';
             } else {
-                filteredResp.forEach((item, index) => {
+                let htmlFrag = '';
+                filteredResp.slice(0, 100).forEach((item, index) => {
                     let respBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Fast Response</span>';
-                    if (item.avgResponse > 1.5) {
-                        respBadge = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Critical Delay (&gt;1.5 Jam)</span>';
-                    } else if (item.avgResponse > 0.5) {
-                        respBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Moderate Delay</span>';
-                    }
+                    if (item.avgResponse > 1.5) respBadge = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Critical Delay (&gt;1.5 Jam)</span>';
+                    else if (item.avgResponse > 0.5) respBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Moderate Delay</span>';
 
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50 border-b border-slate-100';
-                    tr.innerHTML = `
-                        <td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td>
-                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
-                        <td class="py-2.5 px-3 text-slate-500">${item.branch}</td>
-                        <td class="py-2.5 px-3 text-center font-semibold text-blue-700">${item.tickets}</td>
-                        <td class="py-2.5 px-3 text-center font-bold text-rose-600 bg-rose-50/50">${item.avgResponse.toFixed(2)} Jam</td>
-                        <td class="py-2.5 px-3 text-center">${respBadge}</td>
-                    `;
-                    tbodyResp.appendChild(tr);
+                    htmlFrag += `<tr class="hover:bg-slate-50 border-b border-slate-100"><td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td><td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td><td class="py-2.5 px-3 text-slate-500">${item.branch}</td><td class="py-2.5 px-3 text-center font-semibold text-blue-700">${item.tickets}</td><td class="py-2.5 px-3 text-center font-bold text-rose-600 bg-rose-50/50">${item.avgResponse.toFixed(2)} Jam</td><td class="py-2.5 px-3 text-center">${respBadge}</td></tr>`;
                 });
+                tbodyResp.innerHTML = htmlFrag;
             }
 
             if (chartWorstEngineerSkillInstance) chartWorstEngineerSkillInstance.destroy();
@@ -2096,123 +2053,52 @@
                 data: {
                     labels: top10ParetoSkill.map(t => t.name.split(' ')[0] + ' ' + (t.name.split(' ')[1] || '')),
                     datasets: [
-                        {
-                            type: 'line',
-                            label: 'Kumulatif Gagal SLA (%)',
-                            data: top10ParetoSkill.map(t => parseFloat(t.cumPct.toFixed(1))),
-                            borderColor: '#f59e0b',
-                            backgroundColor: '#f59e0b',
-                            borderWidth: 2,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#f59e0b',
-                            yAxisID: 'y1',
-                            tension: 0.2
-                        },
-                        {
-                            type: 'bar',
-                            label: 'Jumlah Tiket Gagal Stage 3 (>120m)',
-                            data: top10ParetoSkill.map(t => t.s3Fail),
-                            backgroundColor: '#10b981',
-                            borderRadius: 6,
-                            yAxisID: 'y'
-                        }
+                        { type: 'line', label: 'Kumulatif Gagal SLA (%)', data: top10ParetoSkill.map(t => parseFloat(t.cumPct.toFixed(1))), borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#f59e0b', yAxisID: 'y1', tension: 0.2 },
+                        { type: 'bar', label: 'Jumlah Tiket Gagal Stage 3 (>120m)', data: top10ParetoSkill.map(t => t.s3Fail), backgroundColor: '#10b981', borderRadius: 6, yAxisID: 'y' }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false, animation: false,
                     plugins: {
-                        legend: {
-                            display: true,
-                            labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    if (context.dataset.yAxisID === 'y1') {
-                                        return ` Kumulatif Gagal: ${context.parsed.y}%`;
-                                    }
-                                    return ` Tiket Gagal Stage 3: ${context.parsed.y} Tiket`;
-                                }
-                            }
-                        }
+                        legend: { display: true, labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } } },
+                        tooltip: { callbacks: { label: ctx => ctx.dataset.yAxisID === 'y1' ? ` Kumulatif Gagal: ${ctx.parsed.y}%` : ` Tiket Gagal Stage 3: ${ctx.parsed.y} Tiket` } }
                     },
                     scales: {
                         x: { ticks: { color: '#a7f3d0', font: { size: 10, weight: 'bold' } } },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            beginAtZero: true,
-                            title: { display: true, text: 'Tiket Gagal SLA', color: '#10b981', font: { size: 10 } },
-                            ticks: { color: '#cbd5e1', precision: 0 }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            min: 0,
-                            max: 100,
-                            title: { display: true, text: 'Kumulatif %', color: '#f59e0b', font: { size: 10 } },
-                            ticks: {
-                                color: '#fde68a',
-                                callback: function(value) { return value + '%'; }
-                            },
-                            grid: { drawOnChartArea: false }
-                        }
+                        y: { type: 'linear', display: true, position: 'left', beginAtZero: true, title: { display: true, text: 'Tiket Gagal SLA', color: '#10b981', font: { size: 10 } }, ticks: { color: '#cbd5e1', precision: 0 } },
+                        y1: { type: 'linear', display: true, position: 'right', min: 0, max: 100, title: { display: true, text: 'Kumulatif %', color: '#f59e0b', font: { size: 10 } }, ticks: { color: '#fde68a', callback: val => val + '%' }, grid: { drawOnChartArea: false } }
                     }
                 }
             });
 
             const tbodySkill = document.getElementById('worstEngineerSkillTableBody');
             tbodySkill.innerHTML = '';
-
-            let filteredSkill = skillList;
-            if (keyword) {
-                filteredSkill = skillList.filter(t => 
-                    t.name.toLowerCase().includes(keyword) || 
-                    t.branch.toLowerCase().includes(keyword)
-                );
-            }
+            let filteredSkill = keyword ? skillList.filter(t => t.name.toLowerCase().includes(keyword) || t.branch.toLowerCase().includes(keyword)) : skillList;
 
             if (filteredSkill.length === 0) {
                 tbodySkill.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada data teknisi yang sesuai pencarian.</td></tr>';
             } else {
-                filteredSkill.forEach((item, index) => {
+                let htmlFrag2 = '';
+                function formatMinsToHm(mins) {
+                    if (mins <= 0) return '-';
+                    const h = Math.floor(mins / 60);
+                    const m = Math.round(mins % 60);
+                    return h > 0 ? `${h}j ${m}m` : `${m}m`;
+                }
+
+                filteredSkill.slice(0, 100).forEach((item, index) => {
                     let skillBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Skill Optimal</span>';
-                    if (item.skillIndex < 40) {
-                        skillBadge = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Low Skill (Perlu Training Urgent)</span>';
-                    } else if (item.skillIndex < 70) {
-                        skillBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Perlu Refreshment Skill</span>';
-                    }
+                    if (item.skillIndex < 40) skillBadge = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Low Skill (Perlu Training Urgent)</span>';
+                    else if (item.skillIndex < 70) skillBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Perlu Refreshment Skill</span>';
 
-                    function formatMinsToHm(mins) {
-                        if (mins <= 0) return '-';
-                        const h = Math.floor(mins / 60);
-                        const m = Math.round(mins % 60);
-                        return h > 0 ? `${h}j ${m}m` : `${m}m`;
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50 border-b border-slate-100';
-                    tr.innerHTML = `
-                        <td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td>
-                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
-                        <td class="py-2.5 px-3 text-slate-500">${item.branch}</td>
-                        <td class="py-2.5 px-3 text-center font-semibold text-emerald-700">${item.s3Pass} Tiket</td>
-                        <td class="py-2.5 px-3 text-center font-bold text-rose-600 bg-rose-50/50">${item.s3Fail} Tiket</td>
-                        <td class="py-2.5 px-3 text-center font-medium">${formatMinsToHm(item.avgStage3Min)}</td>
-                        <td class="py-2.5 px-3 text-center font-black text-emerald-800 bg-emerald-50/50">${item.skillIndex.toFixed(1)}%</td>
-                        <td class="py-2.5 px-3 text-center">${skillBadge}</td>
-                    `;
-                    tbodySkill.appendChild(tr);
+                    htmlFrag2 += `<tr class="hover:bg-slate-50 border-b border-slate-100"><td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td><td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td><td class="py-2.5 px-3 text-slate-500">${item.branch}</td><td class="py-2.5 px-3 text-center font-semibold text-emerald-700">${item.s3Pass} Tiket</td><td class="py-2.5 px-3 text-center font-bold text-rose-600 bg-rose-50/50">${item.s3Fail} Tiket</td><td class="py-2.5 px-3 text-center font-medium">${formatMinsToHm(item.avgStage3Min)}</td><td class="py-2.5 px-3 text-center font-black text-emerald-800 bg-emerald-50/50">${item.skillIndex.toFixed(1)}%</td><td class="py-2.5 px-3 text-center">${skillBadge}</td></tr>`;
                 });
+                tbodySkill.innerHTML = htmlFrag2;
             }
         }
 
         function renderWorstTravelBranchModule(branchMap, totalTickets, totalTravelHours, keyword) {
             let list = Object.values(branchMap);
-
             list.forEach(b => {
                 b.avgTravel = b.tickets > 0 ? (b.totalTravelHours / b.tickets) : 0;
                 b.avgTTR = b.tickets > 0 ? (b.totalTTRHours / b.tickets) : 0;
@@ -2224,12 +2110,10 @@
             const top10WorstTravel = sortedByWorstTravel.slice(0, 10);
 
             if (sortedByWorstTravel.length > 0) {
-                const worstB = sortedByWorstTravel[0];
-                document.getElementById('kpiWorstTravelBranch').innerText = worstB.branch + ` (Area ${worstB.area})`;
-                document.getElementById('kpiWorstTravelHours').innerText = worstB.avgTravel.toFixed(2) + ' Jam Perjalanan';
+                document.getElementById('kpiWorstTravelBranch').innerText = sortedByWorstTravel[0].branch + ` (Area ${sortedByWorstTravel[0].area})`;
+                document.getElementById('kpiWorstTravelHours').innerText = sortedByWorstTravel[0].avgTravel.toFixed(2) + ' Jam Perjalanan';
             }
-            const natAvgTravel = totalTickets > 0 ? (totalTravelHours / totalTickets).toFixed(2) : 0;
-            document.getElementById('kpiNationalTravelHours').innerText = natAvgTravel + ' Jam';
+            document.getElementById('kpiNationalTravelHours').innerText = (totalTickets > 0 ? (totalTravelHours / totalTickets).toFixed(2) : 0) + ' Jam';
 
             if (chartWorstBranchTravelTimeInstance) chartWorstBranchTravelTimeInstance.destroy();
             const ctx = document.getElementById('chartWorstBranchTravelTime').getContext('2d');
@@ -2238,43 +2122,20 @@
                 data: {
                     labels: top10WorstTravel.map(b => b.branch),
                     datasets: [
-                        {
-                            label: 'Avg Travel Time (Jam)',
-                            data: top10WorstTravel.map(b => parseFloat(b.avgTravel.toFixed(2))),
-                            backgroundColor: '#f59e0b',
-                            borderRadius: 6
-                        },
-                        {
-                            label: 'SLA Stage 2 Travel Success Rate (%)',
-                            data: top10WorstTravel.map(b => parseFloat(b.stage2TravelRate.toFixed(1))),
-                            backgroundColor: '#38bdf8',
-                            borderRadius: 6
-                        }
+                        { label: 'Avg Travel Time (Jam)', data: top10WorstTravel.map(b => parseFloat(b.avgTravel.toFixed(2))), backgroundColor: '#f59e0b', borderRadius: 6 },
+                        { label: 'SLA Stage 2 Travel Success Rate (%)', data: top10WorstTravel.map(b => parseFloat(b.stage2TravelRate.toFixed(1))), backgroundColor: '#38bdf8', borderRadius: 6 }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } } }
-                    },
-                    scales: {
-                        x: { ticks: { color: '#fde68a', font: { size: 11, weight: 'bold' } } },
-                        y: { ticks: { color: '#cbd5e1' } }
-                    }
+                    responsive: true, maintainAspectRatio: false, animation: false,
+                    plugins: { legend: { labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } } } },
+                    scales: { x: { ticks: { color: '#fde68a', font: { size: 11, weight: 'bold' } } }, y: { ticks: { color: '#cbd5e1' } } }
                 }
             });
 
             const tbody = document.getElementById('worstTravelTableBody');
             tbody.innerHTML = '';
-
-            let filteredList = list;
-            if (keyword) {
-                filteredList = list.filter(b => 
-                    b.branch.toLowerCase().includes(keyword) || 
-                    b.area.toLowerCase().includes(keyword)
-                );
-            }
+            let filteredList = keyword ? list.filter(b => b.branch.toLowerCase().includes(keyword) || b.area.toLowerCase().includes(keyword)) : list;
 
             if (filteredList.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-slate-400">Tidak ada data Branch yang sesuai pencarian.</td></tr>';
@@ -2282,136 +2143,69 @@
             }
 
             filteredList.sort((a, b) => b.avgTravel - a.avgTravel);
-
-            filteredList.forEach((item, index) => {
+            let htmlFrag = '';
+            filteredList.slice(0, 100).forEach((item, index) => {
                 let travelEval = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Akses Wajar</span>';
-                if (item.avgTravel > 1.75) {
-                    travelEval = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Sangat Jauh / Terisolir</span>';
-                } else if (item.avgTravel > 1.25) {
-                    travelEval = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Tinggi (Mobilisasi Lama)</span>';
-                }
+                if (item.avgTravel > 1.75) travelEval = '<span class="bg-rose-600 text-white font-black px-2 py-0.5 rounded text-[10px] animate-pulse">Sangat Jauh / Terisolir</span>';
+                else if (item.avgTravel > 1.25) travelEval = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Tinggi (Mobilisasi Lama)</span>';
 
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 border-b border-slate-100';
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td>
-                    <td class="py-2.5 px-4 font-bold text-slate-800">${item.branch}</td>
-                    <td class="py-2.5 px-3 text-center text-slate-500">Area ${item.area}</td>
-                    <td class="py-2.5 px-3 text-center font-semibold">${item.techs.size} Org</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-blue-700">${item.tickets}</td>
-                    <td class="py-2.5 px-3 text-center font-black text-amber-800 bg-amber-50/50">${item.avgTravel.toFixed(2)} Jam</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-sky-700">${item.stage2TravelRate.toFixed(1)}%</td>
-                    <td class="py-2.5 px-3 text-center font-medium">${item.travelRatio.toFixed(1)}% dari Total TTR</td>
-                    <td class="py-2.5 px-3 text-center">${travelEval}</td>
-                `;
-                tbody.appendChild(tr);
+                htmlFrag += `<tr class="hover:bg-slate-50 border-b border-slate-100"><td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td><td class="py-2.5 px-4 font-bold text-slate-800">${item.branch}</td><td class="py-2.5 px-3 text-center text-slate-500">Area ${item.area}</td><td class="py-2.5 px-3 text-center font-semibold">${item.techs.size} Org</td><td class="py-2.5 px-3 text-center font-bold text-blue-700">${item.tickets}</td><td class="py-2.5 px-3 text-center font-black text-amber-800 bg-amber-50/50">${item.avgTravel.toFixed(2)} Jam</td><td class="py-2.5 px-3 text-center font-bold text-sky-700">${item.stage2TravelRate.toFixed(1)}%</td><td class="py-2.5 px-3 text-center font-medium">${item.travelRatio.toFixed(1)}% dari Total TTR</td><td class="py-2.5 px-3 text-center">${travelEval}</td></tr>`;
             });
+            tbody.innerHTML = htmlFrag;
         }
 
         function renderDualBranchChartsAndTable(branchMap, searchKeyword) {
             const tbody = document.getElementById('branchTableBody');
             tbody.innerHTML = '';
-
             let list = Object.values(branchMap);
 
-            list.forEach(item => {
+            for (let i = 0; i < list.length; i++) {
+                const item = list[i];
                 const totalTested = item.s1Total + item.s2Total + item.s3Total;
                 const totalPassed = item.s1Pass + item.s2Pass + item.s3Pass;
                 item.successRate = totalTested > 0 ? (totalPassed / totalTested) * 100 : 0;
-
                 item.s1Rate = item.s1Total > 0 ? (item.s1Pass / item.s1Total) * 100 : 0;
                 item.s2Rate = item.s2Total > 0 ? (item.s2Pass / item.s2Total) * 100 : 0;
                 item.s3Rate = item.s3Total > 0 ? (item.s3Pass / item.s3Total) * 100 : 0;
-            });
+            }
 
             const sortedByRate = [...list].sort((a, b) => b.successRate - a.successRate || a.tickets - b.tickets);
-
             let best10 = sortedByRate.slice(0, 10);
             let worst10 = sortedByRate.length > 10 ? sortedByRate.slice(-10) : [...sortedByRate].reverse();
 
-            function buildHorizontalChartConfig(branchList, mainColor, isBest) {
-                const labels = branchList.map(b => b.branch);
-                const techData = branchList.map(b => b.techs.size);
-                const ticketData = branchList.map(b => b.tickets);
-                const rateData = branchList.map(b => parseFloat(b.successRate.toFixed(1)));
-
+            function buildHorizontalChartConfig(branchList, isBest) {
                 return {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels: branchList.map(b => b.branch),
                         datasets: [
-                            {
-                                label: 'Jumlah Teknisi (Org)',
-                                data: techData,
-                                backgroundColor: '#60a5fa',
-                                borderRadius: 4,
-                                barThickness: 10
-                            },
-                            {
-                                label: 'Jumlah Gangguan (Tiket)',
-                                data: ticketData,
-                                backgroundColor: '#f59e0b',
-                                borderRadius: 4,
-                                barThickness: 10
-                            },
-                            {
-                                label: 'Success Rate (%)',
-                                data: rateData,
-                                backgroundColor: isBest ? '#10b981' : '#f43f5e',
-                                borderRadius: 4,
-                                barThickness: 10
-                            }
+                            { label: 'Jumlah Teknisi (Org)', data: branchList.map(b => b.techs.size), backgroundColor: '#60a5fa', borderRadius: 4, barThickness: 10 },
+                            { label: 'Jumlah Gangguan (Tiket)', data: branchList.map(b => b.tickets), backgroundColor: '#f59e0b', borderRadius: 4, barThickness: 10 },
+                            { label: 'Success Rate (%)', data: branchList.map(b => parseFloat(b.successRate.toFixed(1))), backgroundColor: isBest ? '#10b981' : '#f43f5e', borderRadius: 4, barThickness: 10 }
                         ]
                     },
                     options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: false,
                         plugins: {
-                            legend: {
-                                labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) label += ': ';
-                                        if (context.parsed.x !== null) {
-                                            label += context.parsed.x + (context.datasetIndex === 2 ? '%' : '');
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
+                            legend: { labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } } },
+                            tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.x}${ctx.datasetIndex === 2 ? '%' : ''}` } }
                         },
                         scales: {
-                            x: {
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                                ticks: { color: '#94a3b8', font: { size: 10 } }
-                            },
-                            y: {
-                                grid: { display: false },
-                                ticks: { color: '#ffffff', font: { size: 11, weight: 'bold' } }
-                            }
+                            x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                            y: { grid: { display: false }, ticks: { color: '#ffffff', font: { size: 11, weight: 'bold' } } }
                         }
                     }
                 };
             }
 
             if (chartBestBranchInstance) chartBestBranchInstance.destroy();
-            const ctxBest = document.getElementById('chartBestBranch').getContext('2d');
-            chartBestBranchInstance = new Chart(ctxBest, buildHorizontalChartConfig(best10, '#10b981', true));
+            chartBestBranchInstance = new Chart(document.getElementById('chartBestBranch').getContext('2d'), buildHorizontalChartConfig(best10, true));
 
             if (chartWorstBranchInstance) chartWorstBranchInstance.destroy();
-            const ctxWorst = document.getElementById('chartWorstBranch').getContext('2d');
-            chartWorstBranchInstance = new Chart(ctxWorst, buildHorizontalChartConfig(worst10, '#f43f5e', false));
+            chartWorstBranchInstance = new Chart(document.getElementById('chartWorstBranch').getContext('2d'), buildHorizontalChartConfig(worst10, false));
 
             if (searchKeyword) {
-                list = list.filter(b => 
-                    b.branch.toLowerCase().includes(searchKeyword) || 
-                    b.area.toLowerCase().includes(searchKeyword) ||
-                    b.regional.toLowerCase().includes(searchKeyword)
-                );
+                list = list.filter(b => b.branch.toLowerCase().includes(searchKeyword) || b.area.toLowerCase().includes(searchKeyword) || b.regional.toLowerCase().includes(searchKeyword));
             }
 
             if (list.length === 0) {
@@ -2420,198 +2214,120 @@
             }
 
             list.sort((a, b) => b.successRate - a.successRate || b.tickets - a.tickets);
+            let htmlFrag = '';
+            function formatStageRate(rate, pass, total) {
+                if (total === 0) return `<span class="text-slate-300 font-mono">-</span>`;
+                let bg = 'bg-emerald-100 text-emerald-800';
+                if (rate < 80 && rate >= 50) bg = 'bg-amber-100 text-amber-800';
+                if (rate < 50) bg = 'bg-rose-100 text-rose-800';
+                return `<span class="px-2 py-0.5 rounded text-[11px] font-bold ${bg}">${rate.toFixed(0)}% (${pass}/${total})</span>`;
+            }
 
-            list.forEach((item, index) => {
+            list.slice(0, 100).forEach((item, index) => {
                 let rateBadge = `<span class="bg-emerald-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.successRate.toFixed(1)}% 🟢</span>`;
-                if (item.successRate < 80 && item.successRate >= 50) {
-                    rateBadge = `<span class="bg-amber-500 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.successRate.toFixed(1)}% 🟡</span>`;
-                } else if (item.successRate < 50) {
-                    rateBadge = `<span class="bg-rose-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.successRate.toFixed(1)}% 🔴</span>`;
-                }
+                if (item.successRate < 80 && item.successRate >= 50) rateBadge = `<span class="bg-amber-500 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.successRate.toFixed(1)}% 🟡</span>`;
+                else if (item.successRate < 50) rateBadge = `<span class="bg-rose-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.successRate.toFixed(1)}% 🔴</span>`;
 
-                function formatStageRate(rate, pass, total) {
-                    if (total === 0) return `<span class="text-slate-300 font-mono">-</span>`;
-                    let bg = 'bg-emerald-100 text-emerald-800';
-                    if (rate < 80 && rate >= 50) bg = 'bg-amber-100 text-amber-800';
-                    if (rate < 50) bg = 'bg-rose-100 text-rose-800';
-
-                    return `<span class="px-2 py-0.5 rounded text-[11px] font-bold ${bg}">${rate.toFixed(0)}% (${pass}/${total})</span>`;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 border-b border-slate-100';
-                tr.innerHTML = `
-                    <td class="py-3 px-3 text-center font-bold text-slate-400">${index + 1}</td>
-                    <td class="py-3 px-4 font-bold text-slate-800">${item.branch}</td>
-                    <td class="py-3 px-3 text-center text-slate-600 font-medium">Area ${item.area}</td>
-                    <td class="py-3 px-3 text-center text-slate-500">${item.regional}</td>
-                    <td class="py-3 px-3 text-center font-semibold text-slate-700">${item.techs.size} Orang</td>
-                    <td class="py-3 px-3 text-center font-bold text-indigo-700">${item.tickets}</td>
-                    <td class="py-3 px-3 text-center">${formatStageRate(item.s1Rate, item.s1Pass, item.s1Total)}</td>
-                    <td class="py-3 px-3 text-center">${formatStageRate(item.s2Rate, item.s2Pass, item.s2Total)}</td>
-                    <td class="py-3 px-3 text-center">${formatStageRate(item.s3Rate, item.s3Pass, item.s3Total)}</td>
-                    <td class="py-3 px-4 text-center bg-indigo-50/60">${rateBadge}</td>
-                `;
-                tbody.appendChild(tr);
+                htmlFrag += `<tr class="hover:bg-slate-50 border-b border-slate-100"><td class="py-3 px-3 text-center font-bold text-slate-400">${index + 1}</td><td class="py-3 px-4 font-bold text-slate-800">${item.branch}</td><td class="py-3 px-3 text-center text-slate-600 font-medium">Area ${item.area}</td><td class="py-3 px-3 text-center text-slate-500">${item.regional}</td><td class="py-3 px-3 text-center font-semibold text-slate-700">${item.techs.size} Orang</td><td class="py-3 px-3 text-center font-bold text-indigo-700">${item.tickets}</td><td class="py-3 px-3 text-center">${formatStageRate(item.s1Rate, item.s1Pass, item.s1Total)}</td><td class="py-3 px-3 text-center">${formatStageRate(item.s2Rate, item.s2Pass, item.s2Total)}</td><td class="py-3 px-3 text-center">${formatStageRate(item.s3Rate, item.s3Pass, item.s3Total)}</td><td class="py-3 px-4 text-center bg-indigo-50/60">${rateBadge}</td></tr>`;
             });
+            tbody.innerHTML = htmlFrag;
         }
 
         function renderMilestoneModule(totalTickets, techMap, natStats, searchKeyword) {
             const activeTechs = Object.values(techMap);
-            const techCount = activeTechs.length;
-
-            document.getElementById('msCardTechCount').innerText = techCount + ' Teknisi';
+            document.getElementById('msCardTechCount').innerText = activeTechs.length + ' Teknisi';
             document.getElementById('msCardTicketCount').innerText = totalTickets + ' Tiket';
-
-            function formatMinToHourMin(mins) {
-                if (mins <= 0) return '0 Mnt';
-                if (mins < 60) return Math.round(mins) + ' Mnt';
-                const h = Math.floor(mins / 60);
-                const m = Math.round(mins % 60);
-                return `${h}j ${m}m`;
-            }
-
-            function getAvg(arr) {
-                if (!arr || arr.length === 0) return 0;
-                return arr.reduce((a, b) => a + b, 0) / arr.length;
-            }
 
             const totalTested = natStats.s1Total + natStats.s2Total + natStats.s3Total;
             const totalPassed = natStats.s1Pass + natStats.s2Pass + natStats.s3Pass;
-            const natOverallScore = totalTested > 0 ? (totalPassed / totalTested) * 100 : 0;
-            document.getElementById('msCardOverallRate').innerText = natOverallScore.toFixed(1) + '%';
-
-            const s1Pct = natStats.s1Total > 0 ? ((natStats.s1Pass / natStats.s1Total) * 100).toFixed(1) : 0;
-            const s2Pct = natStats.s2Total > 0 ? ((natStats.s2Pass / natStats.s2Total) * 100).toFixed(1) : 0;
-            const s3Pct = natStats.s3Total > 0 ? ((natStats.s3Pass / natStats.s3Total) * 100).toFixed(1) : 0;
+            document.getElementById('msCardOverallRate').innerText = (totalTested > 0 ? (totalPassed / totalTested) * 100 : 0).toFixed(1) + '%';
 
             const stagesContainer = document.getElementById('durationStagesContainer');
             stagesContainer.innerHTML = '';
 
             const stagesData = [
-                { title: '1. Fast Response (Create -> Prep)', passPct: s1Pct, passCount: natStats.s1Pass, totalCount: natStats.s1Total, subtitle: 'Threshold Max: 15 Menit', color: 'border-blue-300 bg-blue-50/50 text-blue-900' },
-                { title: '2. Mobilisasi & Travel (Prep -> Tiba)', passPct: s2Pct, passCount: natStats.s2Pass, totalCount: natStats.s2Total, subtitle: 'Threshold Max: 1.45 Jam (105m)', color: 'border-cyan-300 bg-cyan-50/50 text-cyan-900' },
-                { title: '3. Troubleshooting (Tiba -> Close)', passPct: s3Pct, passCount: natStats.s3Pass, totalCount: natStats.s3Total, subtitle: 'Threshold Max: 2 Jam (120m)', color: 'border-emerald-300 bg-emerald-50/50 text-emerald-900' }
+                { title: '1. Fast Response (Create -> Prep)', passPct: natStats.s1Total > 0 ? ((natStats.s1Pass / natStats.s1Total) * 100).toFixed(1) : 0, passCount: natStats.s1Pass, totalCount: natStats.s1Total, subtitle: 'Threshold Max: 15 Menit', color: 'border-blue-300 bg-blue-50/50 text-blue-900' },
+                { title: '2. Mobilisasi & Travel (Prep -> Tiba)', passPct: natStats.s2Total > 0 ? ((natStats.s2Pass / natStats.s2Total) * 100).toFixed(1) : 0, passCount: natStats.s2Pass, totalCount: natStats.s2Total, subtitle: 'Threshold Max: 1.45 Jam (105m)', color: 'border-cyan-300 bg-cyan-50/50 text-cyan-900' },
+                { title: '3. Troubleshooting (Tiba -> Close)', passPct: natStats.s3Total > 0 ? ((natStats.s3Pass / natStats.s3Total) * 100).toFixed(1) : 0, passCount: natStats.s3Pass, totalCount: natStats.s3Total, subtitle: 'Threshold Max: 2 Jam (120m)', color: 'border-emerald-300 bg-emerald-50/50 text-emerald-900' }
             ];
 
             stagesData.forEach(st => {
                 const card = document.createElement('div');
                 card.className = `p-3.5 rounded-xl border ${st.color} flex flex-col justify-between text-center shadow-2xs`;
-                card.innerHTML = `
-                    <span class="font-bold text-[11px] uppercase tracking-tight">${st.title}</span>
-                    <div class="my-2">
-                        <span class="text-2xl font-black">${st.passPct}%</span>
-                        <div class="text-[10px] text-slate-500 font-semibold">(${st.passCount} / ${st.totalCount} Tiket Lolos SLA)</div>
-                    </div>
-                    <div class="text-[10px] opacity-75 font-medium">${st.subtitle}</div>
-                `;
+                card.innerHTML = `<span class="font-bold text-[11px] uppercase tracking-tight">${st.title}</span><div class="my-2"><span class="text-2xl font-black">${st.passPct}%</span><div class="text-[10px] text-slate-500 font-semibold">(${st.passCount} / ${st.totalCount} Tiket Lolos SLA)</div></div><div class="text-[10px] opacity-75 font-medium">${st.subtitle}</div>`;
                 stagesContainer.appendChild(card);
             });
 
             const tbody = document.getElementById('milestoneTableBody');
             tbody.innerHTML = '';
-
-            let filteredList = activeTechs;
-            if (searchKeyword) {
-                filteredList = activeTechs.filter(t => 
-                    t.name.toLowerCase().includes(searchKeyword) || 
-                    t.branch.toLowerCase().includes(searchKeyword)
-                );
-            }
+            let filteredList = searchKeyword ? activeTechs.filter(t => t.name.toLowerCase().includes(searchKeyword) || t.branch.toLowerCase().includes(searchKeyword)) : activeTechs;
 
             if (filteredList.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada data teknisi yang sesuai pencarian.</td></tr>';
                 return;
             }
 
-            filteredList.forEach(t => {
-                const totalTestedT = t.s1Total + t.s2Total + t.s3Total;
-                const totalPassedT = t.s1Pass + t.s2Pass + t.s3Pass;
-                t.overallScore = totalTestedT > 0 ? (totalPassedT / totalTestedT) * 100 : 0;
-
-                t.s1Rate = t.s1Total > 0 ? (t.s1Pass / t.s1Total) * 100 : 0;
-                t.s2Rate = t.s2Total > 0 ? (t.s2Pass / t.s2Total) * 100 : 0;
-                t.s3Rate = t.s3Total > 0 ? (t.s3Pass / t.s3Total) * 100 : 0;
-
-                t.avgS1 = getAvg(t.s1Mins);
-                t.avgS2 = getAvg(t.s2Mins);
-                t.avgS3 = getAvg(t.s3Mins);
-            });
+            for (let i = 0; i < filteredList.length; i++) {
+                const item = filteredList[i];
+                const totalTestedT = item.s1Total + item.s2Total + item.s3Total;
+                const totalPassedT = item.s1Pass + item.s2Pass + item.s3Pass;
+                item.overallScore = totalTestedT > 0 ? (totalPassedT / totalTestedT) * 100 : 0;
+                item.s1Rate = item.s1Total > 0 ? (item.s1Pass / item.s1Total) * 100 : 0;
+                item.s2Rate = item.s2Total > 0 ? (item.s2Pass / item.s2Total) * 100 : 0;
+                item.s3Rate = item.s3Total > 0 ? (item.s3Pass / item.s3Total) * 100 : 0;
+                item.avgS1 = item.s1Mins.length > 0 ? item.s1Mins.reduce((a,b)=>a+b,0)/item.s1Mins.length : 0;
+                item.avgS2 = item.s2Mins.length > 0 ? item.s2Mins.reduce((a,b)=>a+b,0)/item.s2Mins.length : 0;
+                item.avgS3 = item.s3Mins.length > 0 ? item.s3Mins.reduce((a,b)=>a+b,0)/item.s3Mins.length : 0;
+            }
 
             filteredList.sort((a, b) => b.overallScore - a.overallScore || b.tickets - a.tickets);
+            let htmlFrag = '';
+            function formatMinToHourMin(mins) {
+                if (mins <= 0) return '0 Mnt';
+                if (mins < 60) return Math.round(mins) + ' Mnt';
+                return `${Math.floor(mins / 60)}j ${Math.round(mins % 60)}m`;
+            }
 
-            filteredList.forEach((item, index) => {
+            function getStageBadge(rate, pass, total, avgMin) {
+                if (total === 0) return `<span class="text-slate-300 font-mono">-</span>`;
+                let bg = 'bg-emerald-100 text-emerald-800';
+                if (rate < 80 && rate >= 50) bg = 'bg-amber-100 text-amber-800';
+                if (rate < 50) bg = 'bg-rose-100 text-rose-800';
+                return `<div class="flex flex-col items-center justify-center"><span class="font-bold font-mono text-slate-800 text-xs">${formatMinToHourMin(avgMin)}</span><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${bg} mt-0.5">${rate.toFixed(0)}% (${pass}/${total})</span></div>`;
+            }
+
+            filteredList.slice(0, 100).forEach((item, index) => {
                 let scoreBadge = `<span class="bg-emerald-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.overallScore.toFixed(1)}% 🟢</span>`;
-                if (item.overallScore < 80 && item.overallScore >= 50) {
-                    scoreBadge = `<span class="bg-amber-500 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.overallScore.toFixed(1)}% 🟡</span>`;
-                } else if (item.overallScore < 50) {
-                    scoreBadge = `<span class="bg-rose-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.overallScore.toFixed(1)}% 🔴</span>`;
-                }
+                if (item.overallScore < 80 && item.overallScore >= 50) scoreBadge = `<span class="bg-amber-500 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.overallScore.toFixed(1)}% 🟡</span>`;
+                else if (item.overallScore < 50) scoreBadge = `<span class="bg-rose-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-2xs">${item.overallScore.toFixed(1)}% 🔴</span>`;
 
-                function getStageBadge(rate, pass, total, avgMin) {
-                    if (total === 0) return `<span class="text-slate-300 font-mono">-</span>`;
-                    let bg = 'bg-emerald-100 text-emerald-800';
-                    if (rate < 80 && rate >= 50) bg = 'bg-amber-100 text-amber-800';
-                    if (rate < 50) bg = 'bg-rose-100 text-rose-800';
-
-                    return `
-                        <div class="flex flex-col items-center justify-center">
-                            <span class="font-bold font-mono text-slate-800 text-xs">${formatMinToHourMin(avgMin)}</span>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${bg} mt-0.5">${rate.toFixed(0)}% (${pass}/${total})</span>
-                        </div>
-                    `;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 border-b border-slate-100';
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td>
-                    <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
-                    <td class="py-2.5 px-3 text-slate-500">${item.branch}</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-blue-700">${item.tickets}</td>
-                    <td class="py-2.5 px-3 text-center">${getStageBadge(item.s1Rate, item.s1Pass, item.s1Total, item.avgS1)}</td>
-                    <td class="py-2.5 px-3 text-center bg-cyan-50/30">${getStageBadge(item.s2Rate, item.s2Pass, item.s2Total, item.avgS2)}</td>
-                    <td class="py-2.5 px-4 text-center bg-emerald-50/40">${getStageBadge(item.s3Rate, item.s3Pass, item.s3Total, item.avgS3)}</td>
-                    <td class="py-2.5 px-4 text-center bg-emerald-50/60">${scoreBadge}</td>
-                `;
-                tbody.appendChild(tr);
+                htmlFrag += `<tr class="hover:bg-slate-50 border-b border-slate-100"><td class="py-2.5 px-3 text-center font-bold text-slate-400">${index + 1}</td><td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td><td class="py-2.5 px-3 text-slate-500">${item.branch}</td><td class="py-2.5 px-3 text-center font-bold text-blue-700">${item.tickets}</td><td class="py-2.5 px-3 text-center">${getStageBadge(item.s1Rate, item.s1Pass, item.s1Total, item.avgS1)}</td><td class="py-2.5 px-3 text-center bg-cyan-50/30">${getStageBadge(item.s2Rate, item.s2Pass, item.s2Total, item.avgS2)}</td><td class="py-2.5 px-4 text-center bg-emerald-50/40">${getStageBadge(item.s3Rate, item.s3Pass, item.s3Total, item.avgS3)}</td><td class="py-2.5 px-4 text-center bg-emerald-50/60">${scoreBadge}</td></tr>`;
             });
+            tbody.innerHTML = htmlFrag;
         }
 
         function renderDailyTrendMatrix(data, searchKeyword) {
-            const datesSet = new Set();
-            const picMap = {};
+            let datesSet = new Set();
+            let picMap = {};
 
-            data.forEach(row => {
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
                 const timely = row['Timely Report'] || '';
                 const pic = extractPIC(timely);
                 const date = formatDate(row['Start TT Open Time']);
                 const ticketNo = String(row['Tiket'] || row['Nomor TT'] || '-').trim();
 
                 if (date !== 'Unknown Date') datesSet.add(date);
-
-                if (!picMap[pic]) {
-                    picMap[pic] = {
-                        name: pic,
-                        branch: String(row['BRANCH'] || '-').trim(),
-                        dates: {}
-                    };
-                }
-
-                if (!picMap[pic].dates[date]) {
-                    picMap[pic].dates[date] = [];
-                }
+                if (!picMap[pic]) picMap[pic] = { name: pic, branch: String(row['BRANCH'] || '-').trim(), dates: {} };
+                if (!picMap[pic].dates[date]) picMap[pic].dates[date] = [];
                 picMap[pic].dates[date].push(ticketNo);
-            });
+            }
 
             const sortedDates = Array.from(datesSet).sort();
             let picList = Object.values(picMap);
 
             if (searchKeyword) {
-                picList = picList.filter(p => 
-                    p.name.toLowerCase().includes(searchKeyword) || 
-                    p.branch.toLowerCase().includes(searchKeyword)
-                );
+                picList = picList.filter(p => p.name.toLowerCase().includes(searchKeyword) || p.branch.toLowerCase().includes(searchKeyword));
             }
 
             const header = document.getElementById('dailyMatrixHeader');
@@ -2623,9 +2339,7 @@
                     <th rowspan="2" class="py-3 px-4 min-w-[220px] border-r border-b border-slate-200 bg-slate-100 align-middle">Teknisi</th>
                     <th colspan="${sortedDates.length}" class="py-2 px-4 text-center border-b border-slate-200 bg-slate-200/90 text-slate-800 font-bold">Trend Harian</th>
                 </tr>
-                <tr>
-                    ${dateThsHTML}
-                </tr>
+                <tr>${dateThsHTML}</tr>
             `;
 
             const tbody = document.getElementById('dailyMatrixBody');
@@ -2636,169 +2350,85 @@
                 return;
             }
 
-            picList.sort((a, b) => {
-                let countA = Object.values(a.dates).reduce((acc, curr) => acc + curr.length, 0);
-                let countB = Object.values(b.dates).reduce((acc, curr) => acc + curr.length, 0);
-                return countB - countA;
-            });
-
-            picList.forEach((item, index) => {
+            picList.sort((a, b) => Object.values(b.dates).flat().length - Object.values(a.dates).flat().length);
+            let htmlFrag = '';
+            picList.slice(0, 100).forEach((item, index) => {
                 let rowTdsHTML = sortedDates.map(d => {
                     const tickets = item.dates[d];
                     if (tickets && tickets.length > 0) {
                         let badges = tickets.map(t => `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded font-mono font-bold text-[11px] whitespace-nowrap shadow-2xs">${t}</span>`).join('');
-                        return `
-                            <td class="p-2 border-r border-slate-200 align-top bg-blue-50/10">
-                                <div class="badge-container flex flex-wrap gap-1.5 justify-center max-h-52 overflow-y-auto p-1">
-                                    ${badges}
-                                </div>
-                            </td>`;
+                        return `<td class="p-2 border-r border-slate-200 align-top bg-blue-50/10"><div class="badge-container flex flex-wrap gap-1.5 justify-center max-h-52 overflow-y-auto p-1">${badges}</div></td>`;
                     }
                     return `<td class="py-3 px-3 border-r border-slate-200 text-center text-slate-300 font-mono align-middle">-</td>`;
                 }).join('');
 
                 let displayName = `<span class="font-bold text-slate-800">${item.name}</span><div class="text-[10px] text-slate-400">${item.branch}</div>`;
-                if (item.name === 'Tidak Ada PIC') {
-                    displayName = `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold text-[11px] inline-block">Tidak Ada PIC</span><div class="text-[10px] text-slate-400 mt-0.5">${item.branch}</div>`;
-                }
+                if (item.name === 'Tidak Ada PIC') displayName = `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold text-[11px] inline-block">Tidak Ada PIC</span><div class="text-[10px] text-slate-400 mt-0.5">${item.branch}</div>`;
 
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 border-b border-slate-200';
-                tr.innerHTML = `
-                    <td class="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-500 align-top">${index + 1}</td>
-                    <td class="py-3 px-4 border-r border-slate-200 align-top">${displayName}</td>
-                    ${rowTdsHTML}
-                `;
-                tbody.appendChild(tr);
+                htmlFrag += `<tr class="hover:bg-slate-50 border-b border-slate-200"><td class="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-500 align-top">${index + 1}</td><td class="py-3 px-4 border-r border-slate-200 align-top">${displayName}</td>${rowTdsHTML}</tr>`;
             });
+            tbody.innerHTML = htmlFrag;
         }
 
         function renderTimelyDetailTable(list, keyword) {
             const tbody = document.getElementById('timelyDetailTableBody');
             tbody.innerHTML = '';
-
-            let filteredList = list;
-            if (keyword) {
-                filteredList = list.filter(item => 
-                    item.pic.toLowerCase().includes(keyword) || 
-                    item.ticket.toLowerCase().includes(keyword) || 
-                    item.startTime.toLowerCase().includes(keyword) ||
-                    item.lastTime.toLowerCase().includes(keyword)
-                );
-            }
+            let filteredList = keyword ? list.filter(item => item.pic.toLowerCase().includes(keyword) || item.ticket.toLowerCase().includes(keyword) || item.startTime.toLowerCase().includes(keyword) || item.lastTime.toLowerCase().includes(keyword)) : list;
 
             if (filteredList.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400">Tidak ada rincian TTR Timely Report yang sesuai pencarian.</td></tr>';
                 return;
             }
 
-            filteredList.forEach(item => {
-                let picTag = `<span class="font-semibold text-slate-800">${item.pic}</span>`;
-                if (item.pic === 'Tidak Ada PIC') {
-                    picTag = `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-md font-bold text-[11px]">Tidak Ada PIC</span>`;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-purple-50/40 border-b border-slate-100';
-                tr.innerHTML = `
-                    <td class="py-2.5 px-4">${picTag}</td>
-                    <td class="py-2.5 px-4 font-mono font-bold text-blue-700">${item.ticket}</td>
-                    <td class="py-2.5 px-4 text-slate-600 font-mono">${item.startTime}</td>
-                    <td class="py-2.5 px-4 text-slate-700 font-medium">${item.lastTime}</td>
-                    <td class="py-2.5 px-4 text-center font-bold text-purple-800 bg-purple-50/60">${item.duration} Jam</td>
-                `;
-                tbody.appendChild(tr);
+            let htmlFrag = '';
+            filteredList.slice(0, 100).forEach(item => {
+                let picTag = item.pic === 'Tidak Ada PIC' ? `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-md font-bold text-[11px]">Tidak Ada PIC</span>` : `<span class="font-semibold text-slate-800">${item.pic}</span>`;
+                htmlFrag += `<tr class="hover:bg-purple-50/40 border-b border-slate-100"><td class="py-2.5 px-4">${picTag}</td><td class="py-2.5 px-4 font-mono font-bold text-blue-700">${item.ticket}</td><td class="py-2.5 px-4 text-slate-600 font-mono">${item.startTime}</td><td class="py-2.5 px-4 text-slate-700 font-medium">${item.lastTime}</td><td class="py-2.5 px-4 text-center font-bold text-purple-800 bg-purple-50/60">${item.duration} Jam</td></tr>`;
             });
+            tbody.innerHTML = htmlFrag;
         }
 
         function renderHourlyChart(hourlyMap) {
-            const labels = Array.from({length: 24}, (_, i) => String(i).padStart(2, '0') + ':00');
-
             if (chartHourlyOpenTimeInstance) chartHourlyOpenTimeInstance.destroy();
-            const ctx = document.getElementById('chartHourlyOpenTime').getContext('2d');
-            chartHourlyOpenTimeInstance = new Chart(ctx, {
+            chartHourlyOpenTimeInstance = new Chart(document.getElementById('chartHourlyOpenTime').getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Jumlah TT Open',
-                        data: hourlyMap,
-                        borderColor: '#4f46e5',
-                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#4f46e5'
-                    }]
+                    labels: Array.from({length: 24}, (_, i) => String(i).padStart(2, '0') + ':00'),
+                    datasets: [{ label: 'Jumlah TT Open', data: hourlyMap, borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.3, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#4f46e5' }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
             });
         }
 
         function renderTimeCharts(todMap, perfMap) {
             if (chartTimeOfDayInstance) chartTimeOfDayInstance.destroy();
-            const ctx1 = document.getElementById('chartTimeOfDay').getContext('2d');
-            chartTimeOfDayInstance = new Chart(ctx1, {
+            chartTimeOfDayInstance = new Chart(document.getElementById('chartTimeOfDay').getContext('2d'), {
                 type: 'doughnut',
-                data: {
-                    labels: ['Shift-1 (06.00 - 18.00)', 'Shift-2 (18.00 - 06.00)'],
-                    datasets: [{
-                        data: [todMap['Shift-1'], todMap['Shift-2']],
-                        backgroundColor: ['#38bdf8', '#1e293b']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: { labels: ['Shift-1 (06.00 - 18.00)', 'Shift-2 (18.00 - 06.00)'], datasets: [{ data: [todMap['Shift-1'], todMap['Shift-2']], backgroundColor: ['#38bdf8', '#1e293b'] }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: false }
             });
 
-            const times = ['Shift-1', 'Shift-2'];
-            const avgTTRs = times.map(t => perfMap[t].total > 0 ? (perfMap[t].ttrTimely / perfMap[t].total).toFixed(2) : 0);
-            const avgTravels = times.map(t => perfMap[t].total > 0 ? (perfMap[t].travel / perfMap[t].total).toFixed(2) : 0);
-
             if (chartTimePerformanceInstance) chartTimePerformanceInstance.destroy();
-            const ctx2 = document.getElementById('chartTimePerformance').getContext('2d');
-            chartTimePerformanceInstance = new Chart(ctx2, {
+            chartTimePerformanceInstance = new Chart(document.getElementById('chartTimePerformance').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: times,
+                    labels: ['Shift-1', 'Shift-2'],
                     datasets: [
-                        {
-                            label: 'Avg Travel Time (Jam)',
-                            data: avgTravels,
-                            backgroundColor: '#93c5fd',
-                            borderRadius: 6
-                        },
-                        {
-                            label: 'Avg TTR Timely Log (Jam)',
-                            data: avgTTRs,
-                            backgroundColor: '#a855f7',
-                            borderRadius: 6
-                        }
+                        { label: 'Avg Travel Time (Jam)', data: ['Shift-1', 'Shift-2'].map(t => perfMap[t].total > 0 ? (perfMap[t].travel / perfMap[t].total).toFixed(2) : 0), backgroundColor: '#93c5fd', borderRadius: 6 },
+                        { label: 'Avg TTR Timely Log (Jam)', data: ['Shift-1', 'Shift-2'].map(t => perfMap[t].total > 0 ? (perfMap[t].ttrTimely / perfMap[t].total).toFixed(2) : 0), backgroundColor: '#a855f7', borderRadius: 6 }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { responsive: true, maintainAspectRatio: false, animation: false }
             });
         }
 
         function renderAlignmentTable(alignGroup, keyword) {
             const tbody = document.getElementById('alignmentTableBody');
             tbody.innerHTML = '';
-
             let list = Object.values(alignGroup).sort((a, b) => b.tickets - a.tickets);
 
             if (keyword) {
-                list = list.filter(item => {
-                    const picsStr = Array.from(item.pics).join(' ').toLowerCase();
-                    return item.area.toLowerCase().includes(keyword) ||
-                           item.regional.toLowerCase().includes(keyword) ||
-                           item.branch.toLowerCase().includes(keyword) ||
-                           picsStr.includes(keyword);
-                });
+                list = list.filter(item => item.area.toLowerCase().includes(keyword) || item.regional.toLowerCase().includes(keyword) || item.branch.toLowerCase().includes(keyword) || Array.from(item.pics).join(' ').toLowerCase().includes(keyword));
             }
 
             if (list.length === 0) {
@@ -2806,207 +2436,102 @@
                 return;
             }
 
-            list.forEach(item => {
+            let htmlFrag = '';
+            list.slice(0, 100).forEach(item => {
                 const picArray = Array.from(item.pics);
                 const techCount = picArray.length;
                 const ratio = techCount > 0 ? (item.tickets / techCount).toFixed(1) : item.tickets;
 
                 let statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Selaras (Balanced)</span>';
-                if (techCount === 1 && item.tickets >= 5) {
-                    statusBadge = '<span class="bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Monopoli (1 Teknisi)</span>';
-                } else if (ratio > 5) {
-                    statusBadge = '<span class="bg-orange-100 text-orange-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Beban Tinggi</span>';
-                } else if (techCount === 0) {
-                    statusBadge = '<span class="bg-rose-100 text-rose-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Kritis (0 Teknisi)</span>';
-                }
+                if (techCount === 1 && item.tickets >= 5) statusBadge = '<span class="bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Monopoli (1 Teknisi)</span>';
+                else if (ratio > 5) statusBadge = '<span class="bg-orange-100 text-orange-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Beban Tinggi</span>';
+                else if (techCount === 0) statusBadge = '<span class="bg-rose-100 text-rose-800 font-semibold px-2.5 py-1 rounded-full text-[11px]">Kritis (0 Teknisi)</span>';
 
-                let techTagsHTML = picArray.map(p => {
-                    const nameShort = p.split(' ')[0] + ' ' + (p.split(' ')[1] || '');
-                    return `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-md text-[11px] font-medium inline-block m-0.5">${nameShort}</span>`;
-                }).join('');
+                let techTagsHTML = picArray.slice(0, 15).map(p => `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-md text-[11px] font-medium inline-block m-0.5">${p.split(' ')[0] + ' ' + (p.split(' ')[1] || '')}</span>`).join('');
+                if (picArray.length > 15) techTagsHTML += `<span class="text-[10px] text-slate-500 font-bold ml-1">+${picArray.length - 15} lainnya</span>`;
+                if (item.hasUnassigned) techTagsHTML += `<span class="bg-rose-100 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md text-[11px] font-bold inline-block m-0.5">Ada Unassigned</span>`;
 
-                if (item.hasUnassigned) {
-                    techTagsHTML += `<span class="bg-rose-100 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md text-[11px] font-bold inline-block m-0.5">Ada Unassigned</span>`;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50/80';
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-semibold text-slate-700">Area ${item.area}</td>
-                    <td class="py-3 px-4 text-slate-600">${item.regional}</td>
-                    <td class="py-3 px-4 font-bold text-slate-800">${item.branch}</td>
-                    <td class="py-3 px-4 text-center font-bold text-blue-600 text-sm">${item.tickets}</td>
-                    <td class="py-3 px-4 max-w-md">${techTagsHTML}</td>
-                    <td class="py-3 px-4 text-center">${statusBadge}</td>
-                `;
-                tbody.appendChild(tr);
+                htmlFrag += `<tr class="hover:bg-slate-50/80"><td class="py-3 px-4 font-semibold text-slate-700">Area ${item.area}</td><td class="py-3 px-4 text-slate-600">${item.regional}</td><td class="py-3 px-4 font-bold text-slate-800">${item.branch}</td><td class="py-3 px-4 text-center font-bold text-blue-600 text-sm">${item.tickets}</td><td class="py-3 px-4 max-w-md">${techTagsHTML}</td><td class="py-3 px-4 text-center">${statusBadge}</td></tr>`;
             });
+            tbody.innerHTML = htmlFrag;
         }
 
         function renderUnassignedCharts(branchMap, statusMap) {
-            const sortedBranches = Object.entries(branchMap)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 6);
-
-            const bLabels = sortedBranches.map(b => b[0]);
-            const bData = sortedBranches.map(b => b[1]);
-
+            const sortedBranches = Object.entries(branchMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
             if (chartUnassignedBranchInstance) chartUnassignedBranchInstance.destroy();
-            const ctxA = document.getElementById('chartUnassignedBranch').getContext('2d');
-            chartUnassignedBranchInstance = new Chart(ctxA, {
+            chartUnassignedBranchInstance = new Chart(document.getElementById('chartUnassignedBranch').getContext('2d'), {
                 type: 'bar',
-                data: {
-                    labels: bLabels,
-                    datasets: [{
-                        label: 'Tiket Tanpa PIC',
-                        data: bData,
-                        backgroundColor: '#f43f5e',
-                        borderRadius: 6
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
+                data: { labels: sortedBranches.map(b => b[0]), datasets: [{ label: 'Tiket Tanpa PIC', data: sortedBranches.map(b => b[1]), backgroundColor: '#f43f5e', borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false } } }
             });
 
-            const sLabels = Object.keys(statusMap);
-            const sData = Object.values(statusMap);
-
             if (chartUnassignedStatusInstance) chartUnassignedStatusInstance.destroy();
-            const ctxB = document.getElementById('chartUnassignedStatus').getContext('2d');
-            chartUnassignedStatusInstance = new Chart(ctxB, {
+            chartUnassignedStatusInstance = new Chart(document.getElementById('chartUnassignedStatus').getContext('2d'), {
                 type: 'pie',
-                data: {
-                    labels: sLabels,
-                    datasets: [{
-                        data: sData,
-                        backgroundColor: ['#fb7185', '#38bdf8', '#a78bfa', '#facc15', '#4ade80']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: { labels: Object.keys(statusMap), datasets: [{ data: Object.values(statusMap), backgroundColor: ['#fb7185', '#38bdf8', '#a78bfa', '#facc15', '#4ade80'] }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: false }
             });
         }
 
         function renderUnassignedTable(list, keyword) {
             const tbody = document.getElementById('unassignedTableBody');
             tbody.innerHTML = '';
-
-            let filteredList = list;
-            if (keyword) {
-                filteredList = list.filter(item => 
-                    item.ticket.toLowerCase().includes(keyword) || 
-                    item.tt.toLowerCase().includes(keyword) || 
-                    item.branch.toLowerCase().includes(keyword) ||
-                    item.status.toLowerCase().includes(keyword)
-                );
-            }
+            let filteredList = keyword ? list.filter(item => item.ticket.toLowerCase().includes(keyword) || item.tt.toLowerCase().includes(keyword) || item.branch.toLowerCase().includes(keyword) || item.status.toLowerCase().includes(keyword)) : list;
 
             if (filteredList.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-400">Tidak ada tiket tanpa PIC yang sesuai filter.</td></tr>';
                 return;
             }
 
-            filteredList.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-rose-50/50';
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-mono font-bold text-rose-800">${item.ticket}</td>
-                    <td class="py-2.5 px-3 font-mono text-slate-600">${item.tt}</td>
-                    <td class="py-2.5 px-3 font-medium text-slate-700">${item.branch}</td>
-                    <td class="py-2.5 px-3 text-center">${item.ttr}</td>
-                    <td class="py-2.5 px-3 text-center">
-                        <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-semibold text-[10px]">${item.status}</span>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            let htmlFrag = '';
+            filteredList.slice(0, 100).forEach(item => {
+                htmlFrag += `<tr class="hover:bg-rose-50/50"><td class="py-2.5 px-3 font-mono font-bold text-rose-800">${item.ticket}</td><td class="py-2.5 px-3 font-mono text-slate-600">${item.tt}</td><td class="py-2.5 px-3 font-medium text-slate-700">${item.branch}</td><td class="py-2.5 px-3 text-center">${item.ttr}</td><td class="py-2.5 px-3 text-center"><span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-semibold text-[10px]">${item.status}</span></td></tr>`;
             });
+            tbody.innerHTML = htmlFrag;
         }
 
         function renderMainCharts(picMap, completenessCount) {
-            const sortedPICs = Object.values(picMap)
-                .filter(p => p.name !== 'Tidak Ada PIC')
-                .sort((a, b) => b.tickets - a.tickets)
-                .slice(0, 10);
-
-            const labels = sortedPICs.map(p => p.name.split(' ')[0] + ' ' + (p.name.split(' ')[1] || ''));
-            const dataTickets = sortedPICs.map(p => p.tickets);
-
+            const sortedPICs = Object.values(picMap).filter(p => p.name !== 'Tidak Ada PIC').sort((a, b) => b.tickets - a.tickets).slice(0, 10);
             if (chartTopPICInstance) chartTopPICInstance.destroy();
-            const ctx1 = document.getElementById('chartTopPIC').getContext('2d');
-            chartTopPICInstance = new Chart(ctx1, {
+            chartTopPICInstance = new Chart(document.getElementById('chartTopPIC').getContext('2d'), {
                 type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Jumlah Tiket',
-                        data: dataTickets,
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 8
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: { labels: sortedPICs.map(p => p.name.split(' ')[0] + ' ' + (p.name.split(' ')[1] || '')), datasets: [{ label: 'Jumlah Tiket', data: sortedPICs.map(p => p.tickets), backgroundColor: '#3b82f6', borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: false }
             });
 
             if (chartCompletenessInstance) chartCompletenessInstance.destroy();
-            const ctx2 = document.getElementById('chartCompleteness').getContext('2d');
-            chartCompletenessInstance = new Chart(ctx2, {
+            chartCompletenessInstance = new Chart(document.getElementById('chartCompleteness').getContext('2d'), {
                 type: 'doughnut',
-                data: {
-                    labels: ['Milestone Lengkap', 'Parsial', 'Direct Close / Bypass'],
-                    datasets: [{
-                        data: [completenessCount['Lengkap'], completenessCount['Parsial'], completenessCount['Direct Close']],
-                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: { labels: ['Milestone Lengkap', 'Parsial', 'Direct Close / Bypass'], datasets: [{ data: [completenessCount['Lengkap'], completenessCount['Parsial'], completenessCount['Direct Close']], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: false }
             });
         }
 
         function renderTable(picMap, keyword) {
             const tbody = document.getElementById('technicianTableBody');
             tbody.innerHTML = '';
-
             let list = Object.values(picMap).sort((a, b) => b.tickets - a.tickets);
 
-            if (keyword) {
-                list = list.filter(item => 
-                    item.name.toLowerCase().includes(keyword) || 
-                    item.branch.toLowerCase().includes(keyword)
-                );
-            }
+            if (keyword) list = list.filter(item => item.name.toLowerCase().includes(keyword) || item.branch.toLowerCase().includes(keyword));
 
             if (list.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">Tidak ada data teknisi yang sesuai pencarian/filter.</td></tr>';
                 return;
             }
 
-            list.forEach(item => {
+            let htmlFrag = '';
+            list.slice(0, 100).forEach(item => {
                 const avgResp = (item.totalResp / item.tickets).toFixed(2);
                 const avgTimelyTTR = (item.totalTimelyTTR / item.tickets).toFixed(2);
                 const pctLengkap = ((item.lengkap / item.tickets) * 100).toFixed(0);
 
                 let badge = '<span class="bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full text-xs">Efektif</span>';
-                if (item.tickets >= 10) {
-                    badge = '<span class="bg-amber-100 text-amber-700 font-semibold px-2.5 py-1 rounded-full text-xs">Overloaded</span>';
-                } else if (item.name === 'Tidak Ada PIC') {
-                    badge = '<span class="bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full text-xs">Unassigned</span>';
-                }
+                if (item.tickets >= 10) badge = '<span class="bg-amber-100 text-amber-700 font-semibold px-2.5 py-1 rounded-full text-xs">Overloaded</span>';
+                else if (item.name === 'Tidak Ada PIC') badge = '<span class="bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full text-xs">Unassigned</span>';
 
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-slate-100 hover:bg-slate-50/80';
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-medium text-slate-800">${item.name}</td>
-                    <td class="py-3 px-4 text-slate-500">${item.branch}</td>
-                    <td class="py-3 px-4 text-center font-semibold text-slate-700">${item.tickets}</td>
-                    <td class="py-3 px-4 text-center">${pctLengkap}% (${item.lengkap})</td>
-                    <td class="py-3 px-4 text-center">${avgResp}</td>
-                    <td class="py-3 px-4 text-center font-bold text-purple-700 bg-purple-50/50">${avgTimelyTTR}</td>
-                    <td class="py-3 px-4 text-center">${badge}</td>
-                `;
-                tbody.appendChild(tr);
+                htmlFrag += `<tr class="border-b border-slate-100 hover:bg-slate-50/80"><td class="py-3 px-4 font-medium text-slate-800">${item.name}</td><td class="py-3 px-4 text-slate-500">${item.branch}</td><td class="py-3 px-4 text-center font-semibold text-slate-700">${item.tickets}</td><td class="py-3 px-4 text-center">${pctLengkap}% (${item.lengkap})</td><td class="py-3 px-4 text-center">${avgResp}</td><td class="py-3 px-4 text-center font-bold text-purple-700 bg-purple-50/50">${avgTimelyTTR}</td><td class="py-3 px-4 text-center">${badge}</td></tr>`;
             });
+            tbody.innerHTML = htmlFrag;
         }
     </script>
 </body>
